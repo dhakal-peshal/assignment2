@@ -1,0 +1,8 @@
+player[x]
+level[x]
+set up textures and animations[ ]
+allow multiple textures for tiles[ ]
+multiple levels pluss level transitions[ ] (mby read levels from txt files?)
+enemies + combat mechanics[ ]
+improve basic player movement[ ] (specifics in updatePlayer)
+advanced movement (unlocks)[ ]

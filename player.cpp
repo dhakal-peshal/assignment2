@@ -13,7 +13,7 @@ void updatePlayer(Player &player, float dt){
     float accel = 1200.0f;
     float friction = 800.0f;
     float gravity = 900.0f;
-    float jump = -400.0f;
+    float jump = -425.0f;
     // TODO: add coyoteTime, jumpBuffer, variableJumpHeight and ledgeHopping?
 
     // left/right and jump inputs
@@ -39,21 +39,11 @@ void updatePlayer(Player &player, float dt){
     }
 
     // gravity and player movement
+    player.vel.y += gravity * dt;
     player.pos.x += player.vel.x * dt;
     player.pos.y += player.vel.y * dt;
-    player.vel.y += gravity * dt;
-
-    // temp floor
-    float floorY = 580;
-    if(player.pos.y >= floorY) {
-        player.pos.y = floorY;
-        player.vel.y = 0;
-        player.grounded = true;
-    } else {
-        player.grounded = false;
-    }
 }
 
 void drawPlayer(Player &player){
-    drawRect(player.pos, Vec2(16,16), Color::red);
+    drawRect(player.pos, Vec2(PLAYER_SIZE, PLAYER_SIZE), Color::red);
 }

@@ -4,6 +4,8 @@
 #include <engine.h>
 #include <transform.h>
 
+const int PLAYER_SIZE = 32;
+
 struct Player{
     Transform transform;
     Rect hitbox;
