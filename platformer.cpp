@@ -11,6 +11,7 @@
 
 Player player;
 Level level;
+Texture spritesheet;
 
 //Texture spritesheet;
 // Initialise (called once at start)
@@ -18,7 +19,8 @@ void init() {
     setWindowTitle("Platformer");
     //spritesheet = loadTexture("assets/spritesheet.png");
 
-    initPlayer(player);
+    spritesheet = loadTexture("assets/player.png");
+    initPlayer(player, spritesheet);
     level = loadLevel({ // 1 = solid, 0 = empty, 40x22.5 tiles with current resolution
         "0000000000000000000000000000000000000000",
         "0000000000000000000000000000000000000000",
@@ -52,9 +54,9 @@ void update(float dt) {
 }
 
 void render(float lag) {
-    // Background
-    clear(0,0,0);
+    clear(255,255,255); // background, change to texture in future
     drawLevel(level);
+    //drawPlayer(player);
     drawPlayer(player);
 }
 

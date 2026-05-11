@@ -21,14 +21,14 @@ void drawLevel(const Level& level) {
         for(int col = 0; col < level.cols; col++) {
             if(tileSolid(level, col, row)) {
                 Vec2 pos(col * TILE_SIZE, row * TILE_SIZE);
-                drawRect(pos, Vec2(TILE_SIZE, TILE_SIZE), Color::white);
+                drawRect(pos, Vec2(TILE_SIZE, TILE_SIZE), Color::red);
             }
         }
     }
 }
 
 void colPlayerLevel(Player& player, const Level& level) {
-    Vec2 pSize(PLAYER_SIZE, PLAYER_SIZE);
+    Vec2 pSize(PLAYER_SIZE_X, PLAYER_SIZE_Y);
 
     // find what tiles the player overlaps with
     int left   = (int)(player.pos.x) / TILE_SIZE;
