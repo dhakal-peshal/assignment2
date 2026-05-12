@@ -8,19 +8,21 @@
 
 #include"player.h"
 #include"level.h"
+#include"bullet.h"
 
 Player player;
 Level level;
-Texture spritesheet;
+Texture spritesheet, playerSprites;
+std::vector<Bullet> bullets;
 
-//Texture spritesheet;
 // Initialise (called once at start)
 void init() {
     setWindowTitle("Platformer");
-    //spritesheet = loadTexture("assets/spritesheet.png");
+    //SDL_ScaleModeNearest() = true;
 
-    spritesheet = loadTexture("assets/player.png");
-    initPlayer(player, spritesheet);
+    playerSprites = loadTexture("assets/player.png");
+    spritesheet = loadTexture("assets/spritesheet.png");
+    initPlayer(player, playerSprites);
     level = loadLevel({ // 1 = solid, 0 = empty, 40x22.5 tiles with current resolution
         "0000000000000000000000000000000000000000",
         "0000000000000000000000000000000000000000",
@@ -51,6 +53,14 @@ void init() {
 void update(float dt) {
     updatePlayer(player, dt);
     colPlayerLevel(player, level);
+
+    if(keyPressedThisFrame(KEY_Q)) {
+        createBullet(bullets, player.transform, spritesheet);
+    }
+
+    for(Bullet &bullet : bullets) {
+        updateBullet(bullet, dt);
+    }
 }
 
 void render(float lag) {
@@ -58,6 +68,10 @@ void render(float lag) {
     drawLevel(level);
     //drawPlayer(player);
     drawPlayer(player);
+
+    for(Bullet &bullet : bullets) {
+        drawBullet(bullet);
+    }
 }
 
 void close() {

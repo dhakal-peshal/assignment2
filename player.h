@@ -8,16 +8,16 @@ const int PLAYER_SIZE_X = 20;
 const int PLAYER_SIZE_Y = 48;
 
 struct Animation {
-    std::vector<Texture> frames; // A vector (sequence) of individual frames
-    int no_frames;               // Number of frames (just the length of the vector)
-    float duration;              // Duration of animation
-    bool loop;                   // Loop (does the animation loop or just play once)
+    std::vector<Texture> frames;
+    int no_frames;
+    float duration;
+    bool loop;
 };
 
 struct Player{
     Transform transform;
     Rect hitbox;
-    Vec2 vel, pos, size;
+    Vec2 vel, size;
     Texture texture;
     int hp;
     bool grounded;

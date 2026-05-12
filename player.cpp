@@ -2,7 +2,7 @@
 #include "player.h"
 
 void initPlayer(Player &player, Texture spritesheet) {
-    player.pos = Vec2(100, 100);
+    player.transform.localPosition = Vec2(100, 100);
     player.vel = Vec2(0, 0);
     player.grounded = false;
     player.facingRight = true;
@@ -80,12 +80,12 @@ void updatePlayer(Player &player, float dt){
 
     // gravity and player movement
     player.vel.y += gravity * dt;
-    player.pos.x += player.vel.x * dt;
-    player.pos.y += player.vel.y * dt;
+    player.transform.localPosition.x += player.vel.x * dt;
+    player.transform.localPosition.y += player.vel.y * dt;
 
-    // flip direction (wip)
-    //if(player.vel.x > 0) player.transform.localScale.x =  1.0f;
-    //if(player.vel.x < 0) player.transform.localScale.x = -1.0f;
+    // flip direction
+    if(player.vel.x > 0) player.facingRight = true;
+    if(player.vel.x < 0) player.facingRight = false;
 
     // animation state
     if(!player.grounded) {
@@ -99,15 +99,22 @@ void updatePlayer(Player &player, float dt){
 }
 
 void drawPlayer(Player &player){
-    drawRect(player.pos, Vec2(PLAYER_SIZE_X, PLAYER_SIZE_Y), Color::red);
+    drawRect(player.transform.localPosition, Vec2(PLAYER_SIZE_X, PLAYER_SIZE_Y), Color::red);
     Vec2 drawSize(64, 64);
-    //Vec2 drawSize = Vec2(64, 64) * player.transform.scale();
+    if (!player.facingRight) {drawSize.x = -64;}
 
+    // draw state based on if grounded and velocity
+    // due to sprite offset from origin, we need to move it basen on facing direction
     if(!player.grounded) {
-        drawTexture(player.jump, player.pos - Vec2(20, 16), drawSize, 0.0f);
+        drawTexture(player.jump, player.facingRight ? 
+            player.transform.localPosition - Vec2(20, 16) : player.transform.localPosition - Vec2(-44, 16), drawSize);
+
     } else if(std::abs(player.vel.x) > 0.1f) {
-        drawTexture(player.walk.frames[player.frame], player.pos - Vec2(20, 16), drawSize, 0.0f);
+        drawTexture(player.walk.frames[player.frame], player.facingRight ? 
+            player.transform.localPosition - Vec2(20, 16) : player.transform.localPosition - Vec2(-44, 16), drawSize);
+
     } else {
-        drawTexture(player.idle.frames[player.frame], player.pos - Vec2(20, 16), drawSize, 0.0f);
+        drawTexture(player.idle.frames[player.frame], player.facingRight ? 
+            player.transform.localPosition - Vec2(20, 16) : player.transform.localPosition - Vec2(-44, 16), drawSize);
     }
 }

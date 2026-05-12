@@ -31,10 +31,10 @@ void colPlayerLevel(Player& player, const Level& level) {
     Vec2 pSize(PLAYER_SIZE_X, PLAYER_SIZE_Y);
 
     // find what tiles the player overlaps with
-    int left   = (int)(player.pos.x) / TILE_SIZE;
-    int right  = (int)(player.pos.x + pSize.x) / TILE_SIZE;
-    int top    = (int)(player.pos.y) / TILE_SIZE;
-    int bottom = (int)(player.pos.y + pSize.y) / TILE_SIZE;
+    int left   = (int)(player.transform.localPosition.x) / TILE_SIZE;
+    int right  = (int)(player.transform.localPosition.x + pSize.x) / TILE_SIZE;
+    int top    = (int)(player.transform.localPosition.y) / TILE_SIZE;
+    int bottom = (int)(player.transform.localPosition.y + pSize.y) / TILE_SIZE;
 
     for(int row = top; row <= bottom; row++) {
         for(int col = left; col <= right; col++) {
@@ -43,13 +43,13 @@ void colPlayerLevel(Player& player, const Level& level) {
             Vec2 tilePos(col * TILE_SIZE, row * TILE_SIZE);
             Vec2 tileSize(TILE_SIZE, TILE_SIZE);
 
-            if(!collision(player.pos, pSize, tilePos, tileSize)) continue;
+            if(!collision(player.transform.localPosition, pSize, tilePos, tileSize)) continue;
 
             // resolve by finding the shallowest overlap axis
-            float overlapLeft   = (tilePos.x + TILE_SIZE) - player.pos.x;
-            float overlapRight  = (player.pos.x + pSize.x) - tilePos.x;
-            float overlapTop    = (tilePos.y + TILE_SIZE) - player.pos.y;
-            float overlapBottom = (player.pos.y + pSize.y) - tilePos.y;
+            float overlapLeft   = (tilePos.x + TILE_SIZE) - player.transform.localPosition.x;
+            float overlapRight  = (player.transform.localPosition.x + pSize.x) - tilePos.x;
+            float overlapTop    = (tilePos.y + TILE_SIZE) - player.transform.localPosition.y;
+            float overlapBottom = (player.transform.localPosition.y + pSize.y) - tilePos.y;
 
             float minX = std::min(overlapLeft, overlapRight);
             float minY = std::min(overlapTop,  overlapBottom);
@@ -57,16 +57,16 @@ void colPlayerLevel(Player& player, const Level& level) {
             if(minX < minY) {
                 // push player away if overlapping, think this is slightly buggy (player sometimes jitters/slows)
                 if(overlapLeft < overlapRight)
-                    player.pos.x += overlapLeft;
+                    player.transform.localPosition.x += overlapLeft;
                 else
-                    player.pos.x -= overlapRight;
+                    player.transform.localPosition.x -= overlapRight;
                 player.vel.x = 0;
             } else {
                 if(overlapTop < overlapBottom) {
-                    player.pos.y += overlapTop;
+                    player.transform.localPosition.y += overlapTop;
                     player.vel.y = 0;
                 } else {
-                    player.pos.y -= overlapBottom;
+                    player.transform.localPosition.y -= overlapBottom;
                     player.vel.y = 0;
                     player.grounded = true;
                 }
