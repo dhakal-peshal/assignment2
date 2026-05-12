@@ -62,7 +62,7 @@ void updatePlayer(Player &player, float dt){
     if(keyIsPressed(KEY_A)) {x_input =  -1.0f; }
     if(keyIsPressed(KEY_SPACE) && player.grounded) {
         player.vel.y = jump;
-        player.grounded = false;
+        //player.grounded = false;
     }
     // acceleration
     if(x_input != 0) {

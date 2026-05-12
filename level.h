@@ -16,6 +16,6 @@ struct Level {
 Level loadLevel(std::vector<std::string> map);
 bool tileSolid(const Level& level, int col, int row);
 void drawLevel(const Level& level);
-void colPlayerLevel(Player& player, const Level& level);
+void resolvePlayerLevel(Player& player, const Level& level);
 
 #endif

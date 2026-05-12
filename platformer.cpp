@@ -22,6 +22,9 @@ void init() {
 
     playerSprites = loadTexture("assets/player.png");
     spritesheet = loadTexture("assets/spritesheet.png");
+    SDL_SetTextureScaleMode(playerSprites.texture, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureScaleMode(spritesheet.texture, SDL_SCALEMODE_NEAREST);
+
     initPlayer(player, playerSprites);
     level = loadLevel({ // 1 = solid, 0 = empty, 40x22.5 tiles with current resolution
         "0000000000000000000000000000000000000000",
@@ -52,9 +55,9 @@ void init() {
 
 void update(float dt) {
     updatePlayer(player, dt);
-    colPlayerLevel(player, level);
+    resolvePlayerLevel(player, level);
 
-    if(keyPressedThisFrame(KEY_Q)) {
+    if(mouseButtonPressedThisFrame(MOUSE_BUTTON_LEFT)){
         createBullet(bullets, player.transform, spritesheet);
     }
 
