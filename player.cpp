@@ -111,7 +111,7 @@ void updatePlayer(Player &player, float dt){
 }
 
 void drawPlayer(Player &player){
-    drawRect(player.transform.localPosition, Vec2(PLAYER_SIZE_X, PLAYER_SIZE_Y), Color::red);
+    //drawRect(player.transform.localPosition, Vec2(PLAYER_SIZE_X, PLAYER_SIZE_Y), Color::red);
     Vec2 drawSize(64, 64);
     if (!player.facingRight) {drawSize.x = -64;}
 

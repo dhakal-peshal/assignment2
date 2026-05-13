@@ -1,23 +1,46 @@
 #include "level.h"
 #include "player.h"
 #include "bullet.h" 
+#include <fstream>
 #include <collision.h>
+using json = nlohmann::json;
 
-Level loadLevel(std::vector<std::string> map) {
-    Level level;
-    level.tiles = map;
-    level.rows  = map.size();
-    level.cols  = map.empty() ? 0 : map[0].size();
-    return level;
+World loadWorld(const std::string& path) {
+    std::ifstream file(path);
+    json data = json::parse(file);
+
+    World world;
+    world.currentLevel = 0;
+
+    for(auto& lvl : data["levels"]) {
+        LevelData level;
+        level.id   = lvl["id"];
+        level.rows = lvl["tiles"].size();
+        level.cols = lvl["tiles"][0].get<std::string>().size();
+        level.neighbourLeft  = lvl["neighbours"]["left"];
+        level.neighbourRight = lvl["neighbours"]["right"];
+        level.neighbourUp    = lvl["neighbours"]["up"];
+        level.neighbourDown  = lvl["neighbours"]["down"];
+
+        for(auto& row : lvl["tiles"])
+            level.tiles.push_back(row.get<std::string>());
+
+        world.levels.push_back(level);
+    }
+    return world;
 }
 
-bool tileSolid(const Level& level, int col, int row) {
+LevelData& currentLevel(World& world) {
+    return world.levels[world.currentLevel];
+}
+
+bool tileSolid(const LevelData& level, int col, int row) {
     if(row < 0 || row >= level.rows) return false;
     if(col < 0 || col >= level.cols) return false;
     return level.tiles[row][col] == '1';
 }
 
-void drawLevel(const Level& level) {
+void drawLevel(const LevelData& level) {
     for(int row = 0; row < level.rows; row++) {
         for(int col = 0; col < level.cols; col++) {
             if(tileSolid(level, col, row)) {
@@ -28,7 +51,29 @@ void drawLevel(const Level& level) {
     }
 }
 
-void resolvePlayerLevel(Player& player, const Level& level) {
+int checkLevelTransition(Player& player, const LevelData& level) {
+    float worldWidth  = level.cols * TILE_SIZE;
+    float worldHeight = level.rows * TILE_SIZE;
+
+    if(player.transform.localPosition.x < 0) return level.neighbourLeft;
+    if(player.transform.localPosition.x > worldWidth) return level.neighbourRight;
+    if(player.transform.localPosition.y < 0) return level.neighbourUp;
+    if(player.transform.localPosition.y > worldHeight) return level.neighbourDown;
+
+    return -1;
+}
+
+void wrapPlayerPosition(Player& player, const LevelData& level) {
+    float worldWidth  = level.cols * TILE_SIZE;
+    float worldHeight = level.rows * TILE_SIZE;
+
+    if(player.transform.localPosition.x < 0)           player.transform.localPosition.x = worldWidth  - PLAYER_SIZE_X - 1;
+    if(player.transform.localPosition.x > worldWidth)  player.transform.localPosition.x = 1;
+    if(player.transform.localPosition.y < 0)           player.transform.localPosition.y = worldHeight - PLAYER_SIZE_Y - 1;
+    if(player.transform.localPosition.y > worldHeight) player.transform.localPosition.y = 1;
+}
+
+void resolvePlayerLevel(Player& player, const LevelData& level) {
     Vec2 pSize(PLAYER_SIZE_X, PLAYER_SIZE_Y);
     Vec2& pos = player.transform.localPosition;  // reference so changes apply directly
 
@@ -74,7 +119,7 @@ void resolvePlayerLevel(Player& player, const Level& level) {
     }
 }
 
-void resolveBulletLevel(Bullet& bullet, const Level& level) {
+void resolveBulletLevel(Bullet& bullet, const LevelData& level) {
     if(!bullet.active) return;
 
     Vec2& pos = bullet.transform.localPosition;

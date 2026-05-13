@@ -1,16 +1,18 @@
 #include <bullet.h>
+#include "player.h"
 
-// Create a bullet
+// create a bullet
 void createBullet(std::vector<Bullet> &bullets, Transform transform, Texture spritesheet) {
     Bullet bullet;
     bullet.transform = transform;
+    bullet.transform.parent = nullptr;
     
-    Vec2 dir = mousePosition() - transform.localPosition;
+    Vec2 dir = mousePosition() - transform.position();
     float len = sqrt(dir.x * dir.x + dir.y * dir.y);
     if(len > 0) dir = dir / len;
 
     bullet.vel = dir * 1000.0f;
-    bullet.transform.localPosition += dir * 20;
+    bullet.transform.localPosition = transform.position() + dir * 8;
     bullet.texture = subTexture(spritesheet, {8, 32, 8, 8});
     bullet.size = Vec2(8, 8);
     bullet.active = true;
@@ -18,9 +20,8 @@ void createBullet(std::vector<Bullet> &bullets, Transform transform, Texture spr
     bullets.push_back(bullet);
 }
 
-// Update bullet
+// update bullet
 void updateBullet(Bullet &bullet, float dt) {
-    // If bullet Is Active
     //mousePosition
     if(bullet.active) {
         // Move bullet
@@ -34,7 +35,7 @@ void updateBullet(Bullet &bullet, float dt) {
     }
 }
 
-// Draw bullet
+// draw bullet
 void drawBullet(Bullet &bullet) {
     // If bullet is active
     if(bullet.active) {

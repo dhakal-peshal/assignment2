@@ -11,7 +11,7 @@
 #include"bullet.h"
 
 Player player;
-Level level;
+World world;
 Texture spritesheet, playerSprites;
 std::vector<Bullet> bullets;
 
@@ -26,50 +26,34 @@ void init() {
     SDL_SetTextureScaleMode(spritesheet.texture, SDL_SCALEMODE_NEAREST);
 
     initPlayer(player, playerSprites);
-    level = loadLevel({ // 1 = solid, 0 = empty, 40x22.5 tiles with current resolution
-        "0000000000000000000000000000000000000000",
-        "0000000000000000000000000000000000000000",
-        "0000000000000000000000000000000000000000",
-        "0000000000000000000000000000000000000000",
-        "0000000000000000000000000000000000000000",
-        "0000000000000000000000000000000000000000",
-        "0000000000000000000000000000000000000000",
-        "0000000000000000000000000000000000000000",
-        "0000000000000000000000000000000000000000",
-        "0000000000000000000000000000000000000000",
-        "0000000000000000000000000000000000000000",
-        "0000001111111111000000000000000000000000",
-        "1000000000000000000001111100000000000000",
-        "0000000000000000000000000000000111100000",
-        "0000000000000000000000000000000000000000",
-        "0001000000000000000000000000000000000000",
-        "0000000000000000000000000011110000000000",
-        "0000000000000000011111000000000000000000",
-        "0000011110000000000000000000000000000000",
-        "0000000000000000000000000000000000000000",
-        "0000000000000111100000000000000000000000",
-        "0000000000000000000000000000000000000000",
-        "1111111111111111111111111111111111111111",
-    });
+    world = loadWorld("assets/levels.json");
 }
 
 void update(float dt) {
+    // player movement and collision
     updatePlayer(player, dt);
-    resolvePlayerLevel(player, level);
+    resolvePlayerLevel(player, currentLevel(world));
 
+    // fire bullet + bullet collision
     if(mouseButtonPressedThisFrame(MOUSE_BUTTON_LEFT)){
-        createBullet(bullets, player.transform, spritesheet);
+        createBullet(bullets, player.gunTransform, spritesheet);
     }
-
     for(Bullet &bullet : bullets) {
         updateBullet(bullet, dt);
-        resolveBulletLevel(bullet, level);
+        resolveBulletLevel(bullet, currentLevel(world));
+    }
+
+    // world transition
+    int next = checkLevelTransition(player, currentLevel(world));
+    if(next != -1) {
+        world.currentLevel = next;
+        wrapPlayerPosition(player, currentLevel(world));  // see below
     }
 }
 
 void render(float lag) {
     clear(255,255,255); // background, change to texture in future
-    drawLevel(level);
+    drawLevel(currentLevel(world));
     //drawPlayer(player);
     drawPlayer(player);
 

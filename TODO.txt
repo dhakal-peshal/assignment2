@@ -2,9 +2,9 @@ player[x]
 level[x]
 set up textures and animations[x]
 allow multiple textures for tiles[ ]
-make gun and bullet[ ]
+make gun and bullet[x]
 menu [ ]
-multiple levels pluss level transitions[ ] (mby read levels from txt files?)
+multiple levels pluss level transitions[ ] (mby read levels from txt/json files?)
 enemies + combat mechanics[ ]
 improve basic player movement[ ] (specifics in updatePlayer)
 advanced movement (unlocks)[ ]
