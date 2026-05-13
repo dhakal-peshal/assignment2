@@ -1,5 +1,6 @@
 #include "level.h"
 #include "player.h"
+#include "bullet.h" 
 #include <collision.h>
 
 Level loadLevel(std::vector<std::string> map) {
@@ -68,6 +69,33 @@ void resolvePlayerLevel(Player& player, const Level& level) {
                     player.vel.y = 0;
                     player.grounded = true;
                 }
+            }
+        }
+    }
+}
+
+void resolveBulletLevel(Bullet& bullet, const Level& level) {
+    if(!bullet.active) return;
+
+    Vec2& pos = bullet.transform.localPosition;
+    Vec2 halfSize = bullet.size / 2;
+    Vec2 topLeft = pos - halfSize;  // bullet origin is centred
+
+    int left   = (int)(topLeft.x) / TILE_SIZE;
+    int right  = (int)(topLeft.x + bullet.size.x) / TILE_SIZE;
+    int top    = (int)(topLeft.y) / TILE_SIZE;
+    int bottom = (int)(topLeft.y + bullet.size.y) / TILE_SIZE;
+
+    for(int row = top; row <= bottom; row++) {
+        for(int col = left; col <= right; col++) {
+            if(!tileSolid(level, col, row)) continue;
+
+            Vec2 tilePos(col * TILE_SIZE, row * TILE_SIZE);
+            Vec2 tileSize(TILE_SIZE, TILE_SIZE);
+
+            if(collision(topLeft, bullet.size, tilePos, tileSize)) {
+                bullet.active = false;
+                return;  // no need to check further tiles
             }
         }
     }

@@ -9,6 +9,11 @@ void initPlayer(Player &player, Texture spritesheet) {
     player.frame = 0;
     player.animStart = getTimeInSeconds();
 
+    // load gun with transform
+    player.gunTexture = subTexture(spritesheet, Rect{112.0f, 0, 8, 8});
+    player.transform.addChild(&player.gunTransform);
+    player.gunTransform.localPosition = Vec2(PLAYER_SIZE_X / 2, PLAYER_SIZE_Y / 2);
+
     // idle state
     for(int i = 0; i < 2; i++)
         player.idle.frames.push_back(subTexture(spritesheet, Rect{i * 16.0f, 0, 16, 16}));
@@ -62,7 +67,7 @@ void updatePlayer(Player &player, float dt){
     if(keyIsPressed(KEY_A)) {x_input =  -1.0f; }
     if(keyIsPressed(KEY_SPACE) && player.grounded) {
         player.vel.y = jump;
-        //player.grounded = false;
+        player.grounded = false;
     }
     // acceleration
     if(x_input != 0) {
@@ -86,6 +91,13 @@ void updatePlayer(Player &player, float dt){
     // flip direction
     if(player.vel.x > 0) player.facingRight = true;
     if(player.vel.x < 0) player.facingRight = false;
+
+    // rotate gun
+    Vec2 playerCenter = player.transform.localPosition + Vec2(PLAYER_SIZE_X / 2, PLAYER_SIZE_Y / 2);
+    Vec2 dir = mousePosition() - playerCenter;
+    player.gunTransform.localAngle = atan2(dir.y, dir.x);
+    // we can normalize gun offset, however i like that you can hold the gun further away
+    player.gunTransform.localPosition = Vec2(PLAYER_SIZE_X / 2, PLAYER_SIZE_Y / 2) + Vec2(dir.x, dir.y) * 0.1f;
 
     // animation state
     if(!player.grounded) {
@@ -117,4 +129,6 @@ void drawPlayer(Player &player){
         drawTexture(player.idle.frames[player.frame], player.facingRight ? 
             player.transform.localPosition - Vec2(20, 16) : player.transform.localPosition - Vec2(-44, 16), drawSize);
     }
+    // draw gun
+    drawTexture(player.gunTexture, player.gunTransform.position() - Vec2(32, 32) / 2, Vec2(32, 32), player.gunTransform.angle()*58 - 45);
 }

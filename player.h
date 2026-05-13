@@ -27,6 +27,8 @@ struct Player{
     float animStart;
     int frame;
     bool facingRight;
+    Transform gunTransform;
+    Texture gunTexture;
 };
 
 void initPlayer(Player &player, Texture spritesheet);

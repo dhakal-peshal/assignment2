@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include "player.h"
+#include "bullet.h"
 
 const int TILE_SIZE = 32;
 
@@ -17,5 +18,6 @@ Level loadLevel(std::vector<std::string> map);
 bool tileSolid(const Level& level, int col, int row);
 void drawLevel(const Level& level);
 void resolvePlayerLevel(Player& player, const Level& level);
+void resolveBulletLevel(Bullet& bullet, const Level& level);
 
 #endif

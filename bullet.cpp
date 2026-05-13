@@ -9,8 +9,8 @@ void createBullet(std::vector<Bullet> &bullets, Transform transform, Texture spr
     float len = sqrt(dir.x * dir.x + dir.y * dir.y);
     if(len > 0) dir = dir / len;
 
-    bullet.vel = dir * 100.0f;
-    bullet.transform.localPosition += dir * 40;
+    bullet.vel = dir * 1000.0f;
+    bullet.transform.localPosition += dir * 20;
     bullet.texture = subTexture(spritesheet, {8, 32, 8, 8});
     bullet.size = Vec2(8, 8);
     bullet.active = true;
@@ -39,7 +39,7 @@ void drawBullet(Bullet &bullet) {
     // If bullet is active
     if(bullet.active) {
         // Draw Texture and Hitbox
-        drawTexture(bullet.texture, bullet.transform.position() - Vec2(1,1) * 30, Vec2(2,2) * 16, bullet.transform.angle());
-        drawRect(bullet.transform.position() - bullet.size/2, bullet.size, Color::red, bullet.transform.angle());
+        drawTexture(bullet.texture, bullet.transform.position() - Vec2(20,12), Vec2(2,2) * 16, bullet.transform.angle());
+        //drawRect(bullet.transform.position() - bullet.size/2, bullet.size, Color::red, bullet.transform.angle());
     }
 }
