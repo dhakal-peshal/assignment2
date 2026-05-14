@@ -34,6 +34,7 @@ struct Player{
 void initPlayer(Player &player, Texture spritesheet);
 void setAnimation(Player &player, Animation &anim);
 void tickAnimation(Player &player, Animation &anim);
+void recoil(Player &player, int amount);
 void updatePlayer(Player &player, float dt);
 void drawPlayer(Player &player);
 

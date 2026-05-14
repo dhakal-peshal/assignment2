@@ -13,7 +13,7 @@ struct Bullet {
 };
 
 // Create a bullet
-void createBullet(std::vector<Bullet> &bullets, Transform transform, Texture spritesheet);
+void createBullet(std::vector<Bullet> &bullets, Transform transform, Texture spritesheet, int shots, float spread);
 
 // Update bullet
 void updateBullet(Bullet &bullet, float dt);

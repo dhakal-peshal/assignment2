@@ -1,6 +1,8 @@
 #include <algorithm>
 #include "player.h"
 
+AudioClip jumpSound;
+
 void initPlayer(Player &player, Texture spritesheet) {
     player.transform.localPosition = Vec2(100, 100);
     player.vel = Vec2(0, 0);
@@ -8,6 +10,8 @@ void initPlayer(Player &player, Texture spritesheet) {
     player.facingRight = true;
     player.frame = 0;
     player.animStart = getTimeInSeconds();
+
+    jumpSound = loadAudioClip("./assets/audio/jump.wav");
 
     // load gun with transform
     player.gunTexture = subTexture(spritesheet, Rect{112.0f, 0, 8, 8});
@@ -53,6 +57,17 @@ void tickAnimation(Player &player, Animation &anim) {
     player.frame = std::min(player.frame, anim.no_frames - 1);  // guard against out-of-bounds
 }
 
+void recoil(Player &player, int amount) {
+    Vec2 dir = mousePosition() - player.transform.position();
+    float len = sqrt(dir.x*dir.x + dir.y*dir.y);
+    if (len != 0.0f) {
+        dir.x /= len;
+        dir.y /= len;
+    }
+    player.vel.x -= dir.x * 2 * amount;
+    player.vel.y -= dir.y * amount;
+}
+
 void updatePlayer(Player &player, float dt){
     float maxSpeed = 200.0f;
     float accel = 1200.0f;
@@ -67,6 +82,7 @@ void updatePlayer(Player &player, float dt){
     if(keyIsPressed(KEY_A)) {x_input =  -1.0f; }
     if(keyIsPressed(KEY_SPACE) && player.grounded) {
         player.vel.y = jump;
+        playOnce(jumpSound, 1.0f);
         player.grounded = false;
     }
     // acceleration

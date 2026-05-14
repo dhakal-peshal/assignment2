@@ -15,10 +15,10 @@ World loadWorld(const std::string& path, Texture spritesheet) {
     for(auto& lvl : data["levels"]) {
         LevelData level;
         // load level textures
-        level.groundTexture = subTexture(spritesheet, Rect{0, 0, 16, 16});
-        level.brickTexture = subTexture(spritesheet, Rect{16, 0, 16, 16});
-        level.woodTexture = subTexture(spritesheet, Rect{32, 0, 16, 16});
-        level.sheetTexture = subTexture(spritesheet, Rect{48, 0, 16, 16});
+        level.groundTexture = subTexture(spritesheet, Rect{0, 0, 8, 8});
+        level.brickTexture = subTexture(spritesheet, Rect{8, 0, 8, 8});
+        level.woodTexture = subTexture(spritesheet, Rect{16, 0, 8, 8});
+        level.sheetTexture = subTexture(spritesheet, Rect{24, 0, 8, 8});
         // load level data
         level.id   = lvl["id"];
         level.rows = lvl["tiles"].size();

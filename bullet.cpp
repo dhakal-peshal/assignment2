@@ -2,22 +2,31 @@
 #include "player.h"
 
 // create a bullet
-void createBullet(std::vector<Bullet> &bullets, Transform transform, Texture spritesheet) {
+void createBullet(std::vector<Bullet> &bullets, Transform transform, Texture spritesheet, int shots, float spread = 0.0f) {
     Bullet bullet;
     bullet.transform = transform;
     bullet.transform.parent = nullptr;
     
-    Vec2 dir = mousePosition() - transform.position();
-    float len = sqrt(dir.x * dir.x + dir.y * dir.y);
-    if(len > 0) dir = dir / len;
+    for(int i; i < shots; i++) { // if multiple shots needed
+        Vec2 dir = mousePosition() - transform.position();
+        float len = sqrt(dir.x * dir.x + dir.y * dir.y);
+        if(len > 0) dir = dir / len;
 
-    bullet.vel = dir * 1000.0f;
-    bullet.transform.localPosition = transform.position() + dir * 8;
-    bullet.texture = subTexture(spritesheet, {8, 32, 8, 8});
-    bullet.size = Vec2(8, 8);
-    bullet.active = true;
+        // add spread
+        if(spread > 0.0f) {
+            float randomAngle = ((rand() / (float)RAND_MAX) * 2.0f - 1.0f) * spread;
+            dir = rotate(dir, randomAngle);
+        }
+
+        bullet.vel = dir * 1000.0f;
+        bullet.transform.localPosition = transform.position() + dir * 8;
+        bullet.texture = subTexture(spritesheet, {0, 16, 8, 8});
+        bullet.size = Vec2(8, 8);
+        bullet.active = true;
+        
+        bullets.push_back(bullet);
+    }
     
-    bullets.push_back(bullet);
 }
 
 // update bullet
