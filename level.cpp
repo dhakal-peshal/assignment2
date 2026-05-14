@@ -5,7 +5,7 @@
 #include <collision.h>
 using json = nlohmann::json;
 
-World loadWorld(const std::string& path) {
+World loadWorld(const std::string& path, Texture spritesheet) {
     std::ifstream file(path);
     json data = json::parse(file);
 
@@ -14,6 +14,12 @@ World loadWorld(const std::string& path) {
 
     for(auto& lvl : data["levels"]) {
         LevelData level;
+        // load level textures
+        level.groundTexture = subTexture(spritesheet, Rect{0, 0, 16, 16});
+        level.brickTexture = subTexture(spritesheet, Rect{16, 0, 16, 16});
+        level.woodTexture = subTexture(spritesheet, Rect{32, 0, 16, 16});
+        level.sheetTexture = subTexture(spritesheet, Rect{48, 0, 16, 16});
+        // load level data
         level.id   = lvl["id"];
         level.rows = lvl["tiles"].size();
         level.cols = lvl["tiles"][0].get<std::string>().size();
@@ -37,18 +43,7 @@ LevelData& currentLevel(World& world) {
 bool tileSolid(const LevelData& level, int col, int row) {
     if(row < 0 || row >= level.rows) return false;
     if(col < 0 || col >= level.cols) return false;
-    return level.tiles[row][col] == '1';
-}
-
-void drawLevel(const LevelData& level) {
-    for(int row = 0; row < level.rows; row++) {
-        for(int col = 0; col < level.cols; col++) {
-            if(tileSolid(level, col, row)) {
-                Vec2 pos(col * TILE_SIZE, row * TILE_SIZE);
-                drawRect(pos, Vec2(TILE_SIZE, TILE_SIZE), Color::red);
-            }
-        }
-    }
+    return level.tiles[row][col] != '0';
 }
 
 int checkLevelTransition(Player& player, const LevelData& level) {
@@ -141,6 +136,25 @@ void resolveBulletLevel(Bullet& bullet, const LevelData& level) {
             if(collision(topLeft, bullet.size, tilePos, tileSize)) {
                 bullet.active = false;
                 return;  // no need to check further tiles
+            }
+        }
+    }
+}
+
+void drawLevel(const LevelData& level) {
+    for(int row = 0; row < level.rows; row++) {
+        for(int col = 0; col < level.cols; col++) {
+            if(tileSolid(level, col, row)) {
+                char tile = level.tiles[row][col];
+                Vec2 pos(col * TILE_SIZE, row * TILE_SIZE);
+                //drawRect(pos, Vec2(TILE_SIZE, TILE_SIZE), Color::red);
+                switch(tile) {
+                    case '1': drawTexture(level.groundTexture, pos, Vec2(32, 32)); break;
+                    case '2': drawTexture(level.brickTexture,   pos, Vec2(32, 32)); break;
+                    case '3': drawTexture(level.woodTexture,  pos, Vec2(32, 32)); break;
+                    case '4': drawTexture(level.sheetTexture,  pos, Vec2(32, 32)); break;
+                    default:  drawTexture(level.groundTexture, pos, Vec2(32, 32)); break;
+                }
             }
         }
     }

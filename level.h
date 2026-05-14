@@ -15,6 +15,7 @@ struct LevelData {
     std::vector<std::string> tiles;
     int rows, cols;
     int neighbourLeft, neighbourRight, neighbourUp, neighbourDown;
+    Texture groundTexture, brickTexture, woodTexture, sheetTexture;
 };
 
 struct World {
@@ -22,7 +23,7 @@ struct World {
     int currentLevel;
 };
 
-World loadWorld(const std::string& path);
+World loadWorld(const std::string& path, Texture texture);
 LevelData& currentLevel(World& world);
 bool tileSolid(const LevelData& level, int col, int row);
 void drawLevel(const LevelData& level);

@@ -18,7 +18,6 @@ std::vector<Bullet> bullets;
 // Initialise (called once at start)
 void init() {
     setWindowTitle("Platformer");
-    //SDL_ScaleModeNearest() = true;
 
     playerSprites = loadTexture("assets/player.png");
     spritesheet = loadTexture("assets/spritesheet.png");
@@ -26,7 +25,7 @@ void init() {
     SDL_SetTextureScaleMode(spritesheet.texture, SDL_SCALEMODE_NEAREST);
 
     initPlayer(player, playerSprites);
-    world = loadWorld("assets/levels.json");
+    world = loadWorld("assets/levels.json", spritesheet);
 }
 
 void update(float dt) {
