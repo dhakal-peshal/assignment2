@@ -4,7 +4,7 @@ set up textures and animations[x]
 allow multiple textures for tiles[x]
 make gun and bullet[x]
 menu [ ]
-multiple levels pluss level transitions[x] (mby read levels from txt/json files?)
+multiple levels pluss level transitions[x] (read levels from json files)
 enemies[ ]
 interactions[ ](damage tiles, destructable walls, targets)
 improve basic player movement[ ] (specifics in updatePlayer)

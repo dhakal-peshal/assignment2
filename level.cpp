@@ -153,6 +153,7 @@ void drawLevel(const LevelData& level) {
                     case '2': drawTexture(level.brickTexture,   pos, Vec2(32, 32)); break;
                     case '3': drawTexture(level.woodTexture,  pos, Vec2(32, 32)); break;
                     case '4': drawTexture(level.sheetTexture,  pos, Vec2(32, 32)); break;
+                    case 'a': break; // air/invisible tile
                     default:  drawTexture(level.groundTexture, pos, Vec2(32, 32)); break;
                 }
             }
