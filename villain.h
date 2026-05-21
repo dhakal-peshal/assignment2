@@ -7,8 +7,8 @@
 #include "bullet.h"
 #include "level.h"
 
-const int VILLAIN_W = 24;
-const int VILLAIN_H = 40;
+const int VILLAIN_W = 20;
+const int VILLAIN_H = 48;
 
 // State machine for villain behaviour
 enum class VillainState {
@@ -19,14 +19,11 @@ enum class VillainState {
 };
 
 struct Villain {
-    Transform transform;
-    Vec2 vel;
-    Vec2 size;
-
-    int hp;
-    int maxHp;
-    bool grounded;
-    bool facingRight;
+    Transform transform, knifeTransform;
+    Vec2 vel, size;
+    int hp, maxHp;
+    bool grounded, facingRight;
+    Animation* currentAnim = nullptr;
 
     VillainState state;
 
@@ -39,10 +36,16 @@ struct Villain {
     float attackRange;        // pixel radius to damage player
     float attackCooldown;     // seconds between hits
     float attackTimer;
+
+    Animation idle, walk;
+    Texture jump;
+    Texture knifeTexture;
+    float animStart;
+    int frame;
 };
 
 // Lifecycle
-void initVillain(Villain &v, Vec2 startPos);
+void initVillain(Villain &v, Vec2 startPos, Texture spritesheet);
 void updateVillain(Villain &v, Vec2 playerPos, int &playerHp, float dt, const LevelData &level);
 void drawVillain(const Villain &v);
 

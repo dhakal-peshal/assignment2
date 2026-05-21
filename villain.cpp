@@ -53,7 +53,7 @@ bool edgeAhead(const Villain &v, const LevelData &level) {
 }
 
 
-void initVillain(Villain &v, Vec2 startPos) {
+void initVillain(Villain &v, Vec2 startPos, Texture spritesheet) {
     v.transform.localPosition = startPos;
     v.transform.localAngle    = 0.f;
     v.transform.localScale    = Vec2(1, 1);
@@ -76,6 +76,31 @@ void initVillain(Villain &v, Vec2 startPos) {
     v.attackRange    = 30.f;
     v.attackCooldown = 1.0f;
     v.attackTimer    = 0.f;
+
+    // idle animation
+    for(int i = 0; i < 2; i++)
+        v.idle.frames.push_back(subTexture(spritesheet, Rect{i * 16.0f, 0, 16, 16}));
+    v.idle.no_frames = v.idle.frames.size();
+    v.idle.duration  = 0.8f;
+    v.idle.loop      = true;
+
+    // walking animation
+    for(int i = 2; i < 6; i++)
+        v.walk.frames.push_back(subTexture(spritesheet, Rect{i * 16.0f, 0, 16, 16}));
+    v.walk.no_frames = v.walk.frames.size();
+    v.walk.duration  = 0.4f;
+    v.walk.loop      = true;
+
+    // jump
+    v.jump = subTexture(spritesheet, Rect{6 * 16.0f, 0, 16, 16});
+
+    // knife sprite
+    v.knifeTexture = subTexture(spritesheet, Rect{112.0f, 8, 8, 8});
+    v.transform.addChild(&v.knifeTransform);
+    v.knifeTransform.localPosition = Vec2(VILLAIN_W / 2, VILLAIN_H / 2);
+
+    v.animStart = getTimeInSeconds();
+    v.frame     = 0;
 }
 
 
@@ -138,53 +163,46 @@ void updateVillain(Villain &v, Vec2 playerPos, int &playerHp, float dt, const Le
 
     // Tile collision
     resolveVillainLevel(v, level);
+
+    Vec2 villainCenter = v.transform.localPosition + Vec2(VILLAIN_W / 2, VILLAIN_H / 2);
+    Vec2 dir = playerPos - villainCenter;
+    v.knifeTransform.localAngle = atan2(dir.y, dir.x);
+
+    // animation state
+    if(!v.grounded) {
+        // airborne - no tick needed, jump is single frame
+    } else if(std::abs(v.vel.x) > 0.1f) {
+        setAnimation(v, v.walk);  // reusing player's setAnimation
+        tickAnimation(v, v.walk);
+    } else {
+        setAnimation(v, v.idle);
+        tickAnimation(v, v.idle);
+    }
 }
 
 
 void drawVillain(const Villain &v) {
-    if (v.state == VillainState::DEAD) return;
+    if(v.state == VillainState::DEAD) return;
 
-    Vec2 pos  = v.transform.localPosition;
-    bool flash = (v.flashTimer > 0.f);
+    Vec2 drawSize(64, 64);
+    if(!v.facingRight) drawSize.x = -64;
 
-    Color bodyColor = flash ? Color(220, 40, 40) : Color(80, 30, 120);
+    Vec2 spriteOffset = v.facingRight ? Vec2(20, 16) : Vec2(-44, 16);
 
-    fillRect(pos, v.size, bodyColor);
-
-    float eyeY  = pos.y + 10.f;
-    float eyeRX = v.facingRight ? pos.x + 16.f : pos.x + 6.f;
-    float eyeLX = v.facingRight ? pos.x + 10.f : pos.x;
-    fillCircle(eyeRX, eyeY, 4.f, Color(255, 60, 60));
-    fillCircle(eyeLX, eyeY, 4.f, Color(255, 60, 60));
-
-    float mouthY = pos.y + 22.f;
-    if (v.facingRight) {
-        drawLine(Vec2(pos.x + 6.f, mouthY + 3.f), Vec2(pos.x + 12.f, mouthY), Color(255, 180, 180));
-        drawLine(Vec2(pos.x + 12.f, mouthY), Vec2(pos.x + 18.f, mouthY + 3.f), Color(255, 180, 180));
+    if(!v.grounded) {
+        drawTexture(v.jump, v.transform.localPosition - spriteOffset, drawSize);
+    } else if(std::abs(v.vel.x) > 0.1f) {
+        drawTexture(v.walk.frames[v.frame], v.transform.localPosition - spriteOffset, drawSize);
     } else {
-        drawLine(Vec2(pos.x + 4.f, mouthY + 3.f), Vec2(pos.x + 10.f, mouthY), Color(255, 180, 180));
-        drawLine(Vec2(pos.x + 10.f, mouthY), Vec2(pos.x + 16.f, mouthY + 3.f), Color(255, 180, 180));
+        drawTexture(v.idle.frames[v.frame], v.transform.localPosition - spriteOffset, drawSize);
     }
 
-    drawLine(Vec2(pos.x + 4.f,  pos.y),       Vec2(pos.x + 2.f, pos.y - 10.f), Color(200, 80, 0));
-    drawLine(Vec2(pos.x + 18.f, pos.y),       Vec2(pos.x + 20.f, pos.y - 10.f), Color(200, 80, 0));
-
-    float legAnim = (v.state == VillainState::PATROL || v.state == VillainState::CHASE)
-                    ? std::sin(getTimeInSeconds() * 8.f) * 5.f : 0.f;
-    float legY = pos.y + v.size.y;
-    fillRect(Vec2(pos.x + 2.f,  legY), Vec2(8, 6 + legAnim),  Color(60, 20, 90));
-    fillRect(Vec2(pos.x + 14.f, legY), Vec2(8, 6 - legAnim),  Color(60, 20, 90));
-
-    float barW   = 30.f;
-    float barH   = 4.f;
-    float barX   = pos.x + (v.size.x - barW) / 2.f;
-    float barY   = pos.y - 12.f;
-    float filled = barW * ((float)v.hp / (float)v.maxHp);
-
-    fillRect(Vec2(barX, barY), Vec2(barW, barH), Color(60, 0, 0));
-    if (filled > 0.f)
-        fillRect(Vec2(barX, barY), Vec2(filled, barH), Color(220, 50, 50));
-    drawRect(Vec2(barX, barY), Vec2(barW, barH), Color(200, 200, 200));
+    // Draw knife
+    Vec2 knifeSize(16, 16);
+    drawTexture(v.knifeTexture,
+        v.knifeTransform.localPosition - knifeSize / 2,
+        knifeSize,
+        v.knifeTransform.localAngle);
 }
 
 

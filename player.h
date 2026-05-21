@@ -13,6 +13,26 @@ struct Animation {
     float duration;
     bool loop;
 };
+// using templates so functions can be used for both player and enemies
+template<typename T>
+void setAnimation(T &entity, Animation &anim) {
+    if(entity.currentAnim != &anim) {
+        entity.currentAnim = &anim;
+        entity.animStart   = getTimeInSeconds();
+        entity.frame       = 0;
+    }
+}
+template<typename T>
+void tickAnimation(T &entity, Animation &anim) {
+    float elapsed = getTimeInSeconds() - entity.animStart;
+    if(anim.loop) {
+        elapsed = fmod(elapsed, anim.duration);
+    } else {
+        elapsed = std::min(elapsed, anim.duration);
+    }
+    entity.frame = (int)(elapsed / anim.duration * anim.no_frames);
+    entity.frame = std::min(entity.frame, anim.no_frames - 1);
+}
 
 struct Player{
     Transform transform;
@@ -21,6 +41,7 @@ struct Player{
     Texture texture;
     int hp;
     bool grounded;
+    
 
     Animation idle, walk;
     Texture jump;
@@ -29,11 +50,12 @@ struct Player{
     bool facingRight;
     Transform gunTransform;
     Texture gunTexture;
+    Animation* currentAnim = nullptr;
 };
 
 void initPlayer(Player &player, Texture spritesheet);
-void setAnimation(Player &player, Animation &anim);
-void tickAnimation(Player &player, Animation &anim);
+//void setAnimation(Player &player, Animation &anim);
+//void tickAnimation(Player &player, Animation &anim);
 void recoil(Player &player, int amount);
 void updatePlayer(Player &player, float dt);
 void drawPlayer(Player &player);

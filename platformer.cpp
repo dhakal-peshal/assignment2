@@ -13,7 +13,7 @@
 
 Player player;
 World world;
-Texture spritesheet, playerSprites, bg1;
+Texture spritesheet, playerSprites, enemySprites, bg1;
 std::vector<Bullet> bullets;
 std::vector<Villain> villains;   // NEW
 
@@ -25,18 +25,15 @@ bool sReloading = false;
 void init() {
     setWindowTitle("Platformer");
 
+    // loading spritesheets and setting scale mode
     playerSprites = loadTexture("assets/player.png");
-<<<<<<< HEAD
+    enemySprites = loadTexture("assets/enemy.png");
     spritesheet = loadTexture("assets/spritesheet.png");
     bg1 = loadTexture("assets/bg_1.png");
     SDL_SetTextureScaleMode(playerSprites.texture, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureScaleMode(enemySprites.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(spritesheet.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(bg1.texture, SDL_SCALEMODE_NEAREST);
-=======
-    spritesheet   = loadTexture("assets/spritesheet.png");
-    SDL_SetTextureScaleMode(playerSprites.texture, SDL_SCALEMODE_NEAREST);
-    SDL_SetTextureScaleMode(spritesheet.texture,   SDL_SCALEMODE_NEAREST);
->>>>>>> 4546efe51bdba2c2b4fca849125a430c47d7e836
 
     initPlayer(player, playerSprites);
     world = loadWorld("assets/levels.json", spritesheet);
@@ -47,8 +44,8 @@ void init() {
 
     // Spawn villains – adjust Vec2 positions to match your level layout
     Villain v1, v2;
-    initVillain(v1, Vec2(300, 100));
-    initVillain(v2, Vec2(550, 100));
+    initVillain(v1, Vec2(300, 100), enemySprites);
+    initVillain(v2, Vec2(550, 100), enemySprites);
     villains.push_back(v1);
     villains.push_back(v2);
 }
@@ -100,12 +97,8 @@ void update(float dt) {
 }
 
 void render(float lag) {
-<<<<<<< HEAD
     clear(250,190,150); // background, change to texture in future
     drawTexture(bg1, Vec2(0,0), Vec2(320, 180)*4);
-=======
-    clear(250, 190, 150);
->>>>>>> 4546efe51bdba2c2b4fca849125a430c47d7e836
     drawLevel(currentLevel(world));
     drawPlayer(player);
 
