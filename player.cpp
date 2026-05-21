@@ -36,27 +36,6 @@ void initPlayer(Player &player, Texture spritesheet) {
     player.jump = subTexture(spritesheet, Rect{6 * 16.0f, 0, 16, 16});
 }
 
-/*template<typename T> // use template so enemies can use same animation handler
-void setAnimation(T &entity, Animation &anim) {
-    // only restart if switching to a different animation
-    if(entity.currentAnim != &anim) {
-        entity.currentAnim = &anim;
-        entity.animStart   = getTimeInSeconds();
-        entity.frame       = 0;
-    }
-}
-
-void tickAnimation(Player &player, Animation &anim) {
-    float elapsed = getTimeInSeconds() - player.animStart;
-    if(anim.loop) {
-        elapsed = fmod(elapsed, anim.duration);
-    } else {
-        elapsed = std::min(elapsed, anim.duration);
-    }
-    player.frame = (int)(elapsed / anim.duration * anim.no_frames);
-    player.frame = std::min(player.frame, anim.no_frames - 1);  // guard against out-of-bounds
-}*/
-
 void recoil(Player &player, int amount) {
     Vec2 dir = mousePosition() - player.transform.position();
     float len = sqrt(dir.x*dir.x + dir.y*dir.y);

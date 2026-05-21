@@ -6,6 +6,7 @@ make gun and bullet[x]
 menu [ ]
 multiple levels pluss level transitions[x] (read levels from json files)
 enemies[ ]
+enemy spawning/despawning [ ] (mby using map entries)
 interactions[ ](damage tiles, destructable walls, targets)
 improve basic player movement[ ] (specifics in updatePlayer)
 advanced movement (unlocks)[ ]

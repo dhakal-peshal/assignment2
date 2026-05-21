@@ -41,7 +41,7 @@ void resolveVillainLevel(Villain &v, const LevelData &level) {
     }
 }
 
-bool edgeAhead(const Villain &v, const LevelData &level) {
+bool edgeAhead(Villain &v, const LevelData &level) {
     float footX = v.transform.localPosition.x + (v.facingRight ? v.size.x + 2.f : -2.f);
     float footY = v.transform.localPosition.y + v.size.y + 4.f;
 
@@ -53,7 +53,7 @@ bool edgeAhead(const Villain &v, const LevelData &level) {
 }
 
 
-void initVillain(Villain &v, Vec2 startPos, Texture spritesheet) {
+void initVillain(Villain &v, Player &p, Vec2 startPos, Texture spritesheet) {
     v.transform.localPosition = startPos;
     v.transform.localAngle    = 0.f;
     v.transform.localScale    = Vec2(1, 1);
@@ -100,7 +100,7 @@ void initVillain(Villain &v, Vec2 startPos, Texture spritesheet) {
     v.knifeTransform.localPosition = Vec2(VILLAIN_W / 2, VILLAIN_H / 2);
 
     v.animStart = getTimeInSeconds();
-    v.frame     = 0;
+    v.frame = 0;
 }
 
 
@@ -164,9 +164,9 @@ void updateVillain(Villain &v, Vec2 playerPos, int &playerHp, float dt, const Le
     // Tile collision
     resolveVillainLevel(v, level);
 
-    Vec2 villainCenter = v.transform.localPosition + Vec2(VILLAIN_W / 2, VILLAIN_H / 2);
-    Vec2 dir = playerPos - villainCenter;
-    v.knifeTransform.localAngle = atan2(dir.y, dir.x);
+    //Vec2 villainCenter = v.transform.localPosition + Vec2(VILLAIN_W / 2, VILLAIN_H / 2);
+    //Vec2 dir = playerPos - villainCenter;
+    //v.knifeTransform.localAngle = atan2(toPlayer.y, toPlayer.x);
 
     // animation state
     if(!v.grounded) {
@@ -178,10 +178,21 @@ void updateVillain(Villain &v, Vec2 playerPos, int &playerHp, float dt, const Le
         setAnimation(v, v.idle);
         tickAnimation(v, v.idle);
     }
+
+    // knife update
+    Vec2 villainCenter = v.transform.localPosition + Vec2(VILLAIN_W / 2, VILLAIN_H / 2);
+    Vec2 dir = playerPos - villainCenter;
+    float len = sqrt(dir.x * dir.x + dir.y * dir.y);
+    if(len > 0) {
+        dir.x /= len;
+        dir.y /= len;
+    }
+    v.knifeTransform.localAngle = atan2(dir.y, dir.x);
+    v.knifeTransform.localPosition = Vec2(VILLAIN_W / 2, VILLAIN_H / 2) + dir * 25.0f;  // fixed offset distance
 }
 
 
-void drawVillain(const Villain &v) {
+void drawVillain(Villain &v) {
     if(v.state == VillainState::DEAD) return;
 
     Vec2 drawSize(64, 64);
@@ -198,11 +209,8 @@ void drawVillain(const Villain &v) {
     }
 
     // Draw knife
-    Vec2 knifeSize(16, 16);
     drawTexture(v.knifeTexture,
-        v.knifeTransform.localPosition - knifeSize / 2,
-        knifeSize,
-        v.knifeTransform.localAngle);
+        v.transform.localPosition + v.knifeTransform.localPosition - Vec2(32, 32) / 2, Vec2(32, 32), v.knifeTransform.localAngle * 58 - 45);
 }
 
 

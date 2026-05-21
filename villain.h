@@ -6,6 +6,7 @@
 #include <vector>
 #include "bullet.h"
 #include "level.h"
+#include "player.h"
 
 const int VILLAIN_W = 20;
 const int VILLAIN_H = 48;
@@ -45,9 +46,9 @@ struct Villain {
 };
 
 // Lifecycle
-void initVillain(Villain &v, Vec2 startPos, Texture spritesheet);
+void initVillain(Villain &v, Player &p, Vec2 startPos, Texture spritesheet);
 void updateVillain(Villain &v, Vec2 playerPos, int &playerHp, float dt, const LevelData &level);
-void drawVillain(const Villain &v);
+void drawVillain(Villain &v);
 
 // Called when a bullet hits the villain; returns true if it killed it
 bool hurtVillain(Villain &v, int damage);

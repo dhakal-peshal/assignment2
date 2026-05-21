@@ -44,8 +44,8 @@ void init() {
 
     // Spawn villains – adjust Vec2 positions to match your level layout
     Villain v1, v2;
-    initVillain(v1, Vec2(300, 100), enemySprites);
-    initVillain(v2, Vec2(550, 100), enemySprites);
+    initVillain(v1, player, Vec2(300, 100), enemySprites);
+    initVillain(v2, player, Vec2(550, 100), enemySprites);
     villains.push_back(v1);
     villains.push_back(v2);
 }
@@ -107,7 +107,7 @@ void render(float lag) {
     }
 
     // Draw villains
-    for (const Villain &v : villains) {
+    for (Villain &v : villains) {
         drawVillain(v);
     }
 }
