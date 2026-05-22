@@ -53,7 +53,7 @@ bool edgeAhead(Villain &v, const LevelData &level) {
 }
 
 
-void initVillain(Villain &v, Player &p, Vec2 startPos, Texture spritesheet) {
+void initVillain(Villain &v, Vec2 startPos, Texture spritesheet) {
     v.transform.localPosition = startPos;
     v.transform.localAngle    = 0.f;
     v.transform.localScale    = Vec2(1, 1);

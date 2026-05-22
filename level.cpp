@@ -1,6 +1,7 @@
 #include "level.h"
 #include "player.h"
 #include "bullet.h" 
+#include "villain.h"
 #include <fstream>
 #include <collision.h>
 using json = nlohmann::json;
@@ -56,6 +57,24 @@ int checkLevelTransition(Player& player, const LevelData& level) {
     if(player.transform.localPosition.y > worldHeight) return level.neighbourDown;
 
     return -1;
+}
+
+void spawnLevelEntities(LevelData &level, std::vector<Villain> &villains, Texture enemySprites) {
+    villains.clear();
+
+    for(int row = 0; row < level.rows; row++) {
+        for(int col = 0; col < level.cols; col++) {
+            char tile = level.tiles[row][col];
+            if(tile == '8') {
+                Villain v;
+                Vec2 worldPos(col * TILE_SIZE, row * TILE_SIZE);
+                initVillain(v, worldPos, enemySprites);
+                villains.push_back(v);
+
+                level.tiles[row][col] = '0';  // remove marker so it isn't treated as solid
+            }
+        }
+    }
 }
 
 void wrapPlayerPosition(Player& player, const LevelData& level) {

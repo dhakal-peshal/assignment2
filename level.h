@@ -10,6 +10,8 @@
 
 const int TILE_SIZE = 32;
 
+struct Villain; // forward decloration to avoid circular dependencies
+
 struct LevelData {
     int id;
     std::vector<std::string> tiles;
@@ -28,6 +30,7 @@ LevelData& currentLevel(World& world);
 bool tileSolid(const LevelData& level, int col, int row);
 void drawLevel(const LevelData& level);
 int checkLevelTransition(Player& player, const LevelData& level);
+void spawnLevelEntities(LevelData& level, std::vector<Villain>& villains, Texture enemySprites);
 void wrapPlayerPosition(Player& player, const LevelData& level);
 
 void resolvePlayerLevel(Player& player, const LevelData& level);

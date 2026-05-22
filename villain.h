@@ -46,7 +46,7 @@ struct Villain {
 };
 
 // Lifecycle
-void initVillain(Villain &v, Player &p, Vec2 startPos, Texture spritesheet);
+void initVillain(Villain &v, Vec2 startPos, Texture spritesheet);
 void updateVillain(Villain &v, Vec2 playerPos, int &playerHp, float dt, const LevelData &level);
 void drawVillain(Villain &v);
 

@@ -9,13 +9,13 @@
 #include "player.h"
 #include "level.h"
 #include "bullet.h"
-#include "villain.h"   // NEW
+#include "villain.h"
 
 Player player;
 World world;
 Texture spritesheet, playerSprites, enemySprites, bg1;
 std::vector<Bullet> bullets;
-std::vector<Villain> villains;   // NEW
+std::vector<Villain> villains;
 
 AudioClip pShot, sShot, sReload;
 float sTimer, pTimer = 0.0f;
@@ -37,17 +37,18 @@ void init() {
 
     initPlayer(player, playerSprites);
     world = loadWorld("assets/levels.json", spritesheet);
+    spawnLevelEntities(currentLevel(world), villains, enemySprites);
 
     pShot   = loadAudioClip("./assets/audio/pistolshot.wav");
     sShot   = loadAudioClip("./assets/audio/shotgunshot.wav");
     sReload = loadAudioClip("./assets/audio/shotgun_reload.wav");
 
     // Spawn villains – adjust Vec2 positions to match your level layout
-    Villain v1, v2;
-    initVillain(v1, player, Vec2(300, 100), enemySprites);
-    initVillain(v2, player, Vec2(550, 100), enemySprites);
-    villains.push_back(v1);
-    villains.push_back(v2);
+    //Villain v1, v2;
+    //initVillain(v1, player, Vec2(300, 100), enemySprites);
+    //initVillain(v2, player, Vec2(550, 100), enemySprites);
+    //villains.push_back(v1);
+    //villains.push_back(v2);
 }
 
 void update(float dt) {
@@ -93,6 +94,8 @@ void update(float dt) {
     if (next != -1) {
         world.currentLevel = next;
         wrapPlayerPosition(player, currentLevel(world));
+        spawnLevelEntities(currentLevel(world), villains, enemySprites);
+        bullets.clear();
     }
 }
 
