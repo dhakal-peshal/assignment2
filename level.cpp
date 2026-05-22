@@ -44,7 +44,8 @@ LevelData& currentLevel(World& world) {
 bool tileSolid(const LevelData& level, int col, int row) {
     if(row < 0 || row >= level.rows) return false;
     if(col < 0 || col >= level.cols) return false;
-    return level.tiles[row][col] != '0';
+    // slightly scuffed implementation, 0 for air tiles and other numbers for spawn tiles
+    return level.tiles[row][col] != '0' && level.tiles[row][col] != '8';
 }
 
 int checkLevelTransition(Player& player, const LevelData& level) {
@@ -60,8 +61,6 @@ int checkLevelTransition(Player& player, const LevelData& level) {
 }
 
 void spawnLevelEntities(LevelData &level, std::vector<Villain> &villains, Texture enemySprites) {
-    villains.clear();
-
     for(int row = 0; row < level.rows; row++) {
         for(int col = 0; col < level.cols; col++) {
             char tile = level.tiles[row][col];
@@ -70,8 +69,6 @@ void spawnLevelEntities(LevelData &level, std::vector<Villain> &villains, Textur
                 Vec2 worldPos(col * TILE_SIZE, row * TILE_SIZE);
                 initVillain(v, worldPos, enemySprites);
                 villains.push_back(v);
-
-                level.tiles[row][col] = '0';  // remove marker so it isn't treated as solid
             }
         }
     }
