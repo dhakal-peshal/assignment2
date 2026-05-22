@@ -13,11 +13,11 @@ const int TILE_SIZE = 32;
 struct Villain; // forward decloration to avoid circular dependencies
 
 struct LevelData {
-    int id;
+    int id, bg;
     std::vector<std::string> tiles;
     int rows, cols;
     int neighbourLeft, neighbourRight, neighbourUp, neighbourDown;
-    Texture groundTexture, brickTexture, woodTexture, sheetTexture;
+    Texture groundTexture, brickTexture, woodTexture, sheetTexture, background;
 };
 
 struct World {

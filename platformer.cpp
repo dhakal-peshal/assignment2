@@ -13,7 +13,7 @@
 
 Player player;
 World world;
-Texture spritesheet, playerSprites, enemySprites, bg1;
+Texture spritesheet, playerSprites, enemySprites;//, bg1;
 std::vector<Bullet> bullets;
 std::vector<Villain> villains;
 
@@ -29,11 +29,11 @@ void init() {
     playerSprites = loadTexture("assets/player.png");
     enemySprites = loadTexture("assets/enemy.png");
     spritesheet = loadTexture("assets/spritesheet.png");
-    bg1 = loadTexture("assets/bg_1.png");
+    //bg1 = loadTexture("assets/bg_out_l.png");
     SDL_SetTextureScaleMode(playerSprites.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(enemySprites.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(spritesheet.texture, SDL_SCALEMODE_NEAREST);
-    SDL_SetTextureScaleMode(bg1.texture, SDL_SCALEMODE_NEAREST);
+    //SDL_SetTextureScaleMode(bg1.texture, SDL_SCALEMODE_NEAREST);
 
     initPlayer(player, playerSprites);
     world = loadWorld("assets/levels.json", spritesheet);
@@ -95,7 +95,7 @@ void update(float dt) {
 
 void render(float lag) {
     clear(250,190,150); // background, change to texture in future
-    drawTexture(bg1, Vec2(0,0), Vec2(320, 180)*4);
+    //drawTexture(bg1, Vec2(0,0), Vec2(320, 180)*4);
     drawLevel(currentLevel(world));
     drawPlayer(player);
 

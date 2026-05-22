@@ -6,6 +6,8 @@
 #include <collision.h>
 using json = nlohmann::json;
 
+Texture bg;
+
 World loadWorld(const std::string& path, Texture spritesheet) {
     std::ifstream file(path);
     json data = json::parse(file);
@@ -22,6 +24,7 @@ World loadWorld(const std::string& path, Texture spritesheet) {
         level.sheetTexture = subTexture(spritesheet, Rect{24, 0, 8, 8});
         // load level data
         level.id   = lvl["id"];
+        level.bg = lvl["bg"];
         level.rows = lvl["tiles"].size();
         level.cols = lvl["tiles"][0].get<std::string>().size();
         level.neighbourLeft  = lvl["neighbours"]["left"];
@@ -31,8 +34,13 @@ World loadWorld(const std::string& path, Texture spritesheet) {
 
         for(auto& row : lvl["tiles"])
             level.tiles.push_back(row.get<std::string>());
-
         world.levels.push_back(level);
+
+        if (level.bg == 0) level.background = loadTexture("assets/bg_out_l.png");
+        else if (level.bg == 1) level.background = loadTexture("assets/bg_1.png");
+        else level.background = loadTexture("assets/bg_out_down.png");
+
+        SDL_SetTextureScaleMode(level.background.texture, SDL_SCALEMODE_NEAREST); // .texture
     }
     return world;
 }
@@ -158,6 +166,7 @@ void resolveBulletLevel(Bullet& bullet, const LevelData& level) {
 }
 
 void drawLevel(const LevelData& level) {
+    drawTexture(level.background, Vec2(0,0), Vec2(320, 180)*4);
     for(int row = 0; row < level.rows; row++) {
         for(int col = 0; col < level.cols; col++) {
             if(tileSolid(level, col, row)) {
