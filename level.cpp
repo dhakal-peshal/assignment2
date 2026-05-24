@@ -23,7 +23,7 @@ World loadWorld(const std::string& path, Texture spritesheet) {
         level.woodTexture = subTexture(spritesheet, Rect{16, 0, 8, 8});
         level.sheetTexture = subTexture(spritesheet, Rect{24, 0, 8, 8});
         // load level data
-        level.id   = lvl["id"];
+        level.id = lvl["id"];
         level.bg = lvl["bg"];
         level.rows = lvl["tiles"].size();
         level.cols = lvl["tiles"][0].get<std::string>().size();
@@ -32,13 +32,19 @@ World loadWorld(const std::string& path, Texture spritesheet) {
         level.neighbourUp    = lvl["neighbours"]["up"];
         level.neighbourDown  = lvl["neighbours"]["down"];
 
+        // background loading
+        if (level.bg == 0) level.background = loadTexture("assets/bg_out_l.png");
+        else if (level.bg == 1) level.background = loadTexture("assets/bg_wood.png");
+        else if (level.bg == 2) level.background = loadTexture("assets/bg_out_down.png");
+        else if (level.bg == 3) level.background = loadTexture("assets/bg_brick.png");
+        else if (level.bg == 4) level.background = loadTexture("assets/bg_out_up.png");
+        else if (level.bg == 5) level.background = loadTexture("assets/bg_out_top.png");
+        else if (level.bg == 6) level.background = loadTexture("assets/bg_out_r.png");
+
+        // level tile allocation
         for(auto& row : lvl["tiles"])
             level.tiles.push_back(row.get<std::string>());
         world.levels.push_back(level);
-
-        if (level.bg == 0) level.background = loadTexture("assets/bg_out_l.png");
-        else if (level.bg == 1) level.background = loadTexture("assets/bg_1.png");
-        else level.background = loadTexture("assets/bg_out_down.png");
 
         SDL_SetTextureScaleMode(level.background.texture, SDL_SCALEMODE_NEAREST); // .texture
     }
@@ -48,7 +54,7 @@ World loadWorld(const std::string& path, Texture spritesheet) {
 LevelData& currentLevel(World& world) {
     return world.levels[world.currentLevel];
 }
-
+// check if tile should apply collision
 bool tileSolid(const LevelData& level, int col, int row) {
     if(row < 0 || row >= level.rows) return false;
     if(col < 0 || col >= level.cols) return false;
@@ -67,7 +73,7 @@ int checkLevelTransition(Player& player, const LevelData& level) {
 
     return -1;
 }
-
+// function to handle enemy spawners in place of tiles
 void spawnLevelEntities(LevelData &level, std::vector<Villain> &villains, Texture enemySprites) {
     for(int row = 0; row < level.rows; row++) {
         for(int col = 0; col < level.cols; col++) {
