@@ -13,7 +13,7 @@
 
 Player player;
 World world;
-Texture spritesheet, playerSprites, enemySprites;
+Texture spritesheet, playerSprites, enemySprites, shotgun, boot, item_sg, item_b;
 std::vector<Bullet> bullets;
 std::vector<Villain> villains;
 
@@ -35,9 +35,18 @@ void init() {
     playerSprites = loadTexture("assets/player.png");
     enemySprites = loadTexture("assets/enemy.png");
     spritesheet = loadTexture("assets/spritesheet.png");
+    shotgun = loadTexture("assets/shotgun.png");
+    boot = loadTexture("assets/boot.png");
+    item_sg = subTexture(spritesheet, {8, 16, 8, 8});
+    item_b = subTexture(spritesheet, {16, 16, 8, 8});
+
     SDL_SetTextureScaleMode(playerSprites.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(enemySprites.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(spritesheet.texture, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureScaleMode(shotgun.texture, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureScaleMode(boot.texture, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureScaleMode(item_sg.texture, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureScaleMode(item_b.texture, SDL_SCALEMODE_NEAREST);
 
     initPlayer(player, playerSprites);
     world = loadWorld("assets/levels.json", spritesheet);
@@ -122,22 +131,17 @@ void render(float lag) {
     for(PickupData &pickup : currentLevel(world).pickups) {
         if(!pickup.active) continue;
         Vec2 pos(pickup.col * TILE_SIZE, pickup.row * TILE_SIZE);
-        Color c = (pickup.type == 'a') ? Color::yellow : Color::cyan;
-        drawRect(pos, Vec2(TILE_SIZE, TILE_SIZE), c);  // replace with drawTexture once you have sprites
+        Texture t = (pickup.type == 's') ? item_sg : item_b; // check which texture to use for item
+        drawTexture(t, pos, Vec2(TILE_SIZE, TILE_SIZE));
     }
 
     // draw text box
     if(showTextBox) {
-        Vec2 boxPos(50, 500);
-        Vec2 boxSize(620, 80);
-        fillRect(boxPos, boxSize, Color(0, 0, 0));
-        drawRect(boxPos, boxSize, Color::white);
-        //if(textBoxPickup == 'a')
-        //    drawText("You picked up item A!", boxPos + Vec2(20, 30), 24, Color::white);
-        //else
-        //    drawText("You picked up item B!", boxPos + Vec2(20, 30), 24, Color::white);
+        if(textBoxPickup == 's')
+            drawTexture(shotgun, Vec2(440, 240), Vec2(400, 240));
+        else
+            drawTexture(boot, Vec2(440, 240), Vec2(400, 240));
     }
 }
 
-void close() {
-}
+void close() {}

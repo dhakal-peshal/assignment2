@@ -5,7 +5,7 @@ allow multiple textures for tiles[x]
 make gun and bullet[x]
 health [ ]
 menu [ ]
-upgrade pickups [ ]
+upgrade pickups [x]
 multiple levels pluss level transitions[x] (read levels from json files)
 meelee enemies[x]
 ranged enemies [ ]
