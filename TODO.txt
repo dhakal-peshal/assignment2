@@ -9,4 +9,4 @@ enemies[x]
 enemy spawning/despawning [x] (mby using map entries)
 interactions[ ](damage tiles, destructable walls, targets)
 improve basic player movement[ ] (specifics in updatePlayer)
-advanced movement (unlocks)[ ]
+advanced movement (unlocks)[x]

@@ -40,8 +40,9 @@ struct Player{
     Vec2 vel, size;
     Texture texture;
     int hp;
-    bool grounded;
-    
+    bool grounded, onLeftWall, onRightWall;
+    int wallJumpDir;
+    float wallJumpTimer = 0.0f;
 
     Animation idle, walk;
     Texture jump;

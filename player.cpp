@@ -34,6 +34,7 @@ void initPlayer(Player &player, Texture spritesheet) {
 
     // jump state
     player.jump = subTexture(spritesheet, Rect{6 * 16.0f, 0, 16, 16});
+    player.wallJumpDir = 0;
 }
 
 void recoil(Player &player, int amount) {
@@ -57,15 +58,36 @@ void updatePlayer(Player &player, float dt){
 
     // left, right and jump inputs
     float x_input = 0;
+    bool onWall = player.onLeftWall || player.onRightWall;
     if(keyIsPressed(KEY_D)) {x_input =  1.0f; }
     if(keyIsPressed(KEY_A)) {x_input =  -1.0f; }
     if(keyIsPressed(KEY_SPACE) && player.grounded) {
         player.vel.y = jump;
         playOnce(jumpSound, 1.0f);
         player.grounded = false;
+    } 
+    else if (keyPressedThisFrame(KEY_SPACE) && onWall && !player.grounded) {
+        // kick away from the wall horizontally so player can't jump directly vertically, only allow altered wall jumps
+        if(player.onRightWall && player.wallJumpDir != 1) {
+            player.vel.y = jump;
+            player.vel.x = -maxSpeed;
+            player.wallJumpDir = 1;
+            playOnce(jumpSound, 1.0f);
+        } else if(player.onLeftWall && player.wallJumpDir != -1) {
+            player.vel.y = jump;
+            player.vel.x = maxSpeed;
+            player.wallJumpDir = -1;
+            playOnce(jumpSound, 1.0f);
+        }
     }
-    // acceleration
-    if(x_input != 0) {
+    if(player.grounded) {
+        player.wallJumpDir = 0;
+    }
+    // acceleration, wrapped in walljump check (to overwrite movement for a moment)
+    if(player.wallJumpTimer > 0.0f) {
+        player.wallJumpTimer -= dt;
+    } else {
+        if(x_input != 0) {
         player.vel.x += x_input * accel * dt;
         if(player.vel.x >  maxSpeed) player.vel.x =  maxSpeed;
         else if(player.vel.x < -maxSpeed) player.vel.x = -maxSpeed;
@@ -74,8 +96,8 @@ void updatePlayer(Player &player, float dt){
         float frictionStep = friction * dt;
         if(std::abs(player.vel.x) <= frictionStep)
             player.vel.x = 0;
-        else
-            player.vel.x -= std::copysign(frictionStep, player.vel.x);
+        else player.vel.x -= std::copysign(frictionStep, player.vel.x);
+        }
     }
 
     // gravity and player movement

@@ -108,6 +108,8 @@ void resolvePlayerLevel(Player& player, const LevelData& level) {
     int bottom = (int)(pos.y + pSize.y) / TILE_SIZE;
 
     player.grounded = false;  // reset each frame, let collision set it back
+    player.onLeftWall = false;
+    player.onRightWall = false;
 
     for(int row = top; row <= bottom; row++) {
         for(int col = left; col <= right; col++) {
@@ -127,8 +129,14 @@ void resolvePlayerLevel(Player& player, const LevelData& level) {
             float minY = std::min(overlapTop,  overlapBottom);
 
             if(minX < minY) {
-                if(overlapLeft < overlapRight) pos.x += overlapLeft;
-                else                           pos.x -= overlapRight;
+                if(overlapLeft < overlapRight) {
+                    pos.x += overlapLeft;
+                    player.onLeftWall = true;
+                }
+                else {
+                    pos.x -= overlapRight;
+                    player.onRightWall = true;
+                }
                 player.vel.x = 0;
             } else {
                 if(overlapTop < overlapBottom) {
