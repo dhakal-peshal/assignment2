@@ -51,9 +51,9 @@ void updateVillain(Villain &v, Vec2 playerPos, int &playerHp, float dt, const Le
 void drawVillain(Villain &v);
 
 // Called when a bullet hits the villain; returns true if it killed it
-bool hurtVillain(Villain &v, int damage);
+bool hurtVillain(Villain &v);
 
 // Check all bullets against all villains, deactivate bullets that hit
-void resolveBulletsVillains(std::vector<Bullet> &bullets, std::vector<Villain> &villains, int bulletDamage = 25);
+void resolveBulletsVillains(std::vector<Bullet> &bullets, std::vector<Villain> &villains);
 
 #endif

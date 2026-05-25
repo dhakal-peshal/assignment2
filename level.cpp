@@ -59,7 +59,8 @@ bool tileSolid(const LevelData& level, int col, int row) {
     if(row < 0 || row >= level.rows) return false;
     if(col < 0 || col >= level.cols) return false;
     // slightly scuffed implementation, 0 for air tiles and other numbers for spawn tiles
-    return level.tiles[row][col] != '0' && level.tiles[row][col] != '8';
+    char t = level.tiles[row][col];
+    return t != '0' && t != '8' && t != 's' && t != 'b' && t != 'a';
 }
 
 int checkLevelTransition(Player& player, const LevelData& level) {
@@ -112,10 +113,10 @@ void resolvePlayerLevel(Player& player, const LevelData& level) {
     Vec2 pSize(PLAYER_SIZE_X, PLAYER_SIZE_Y);
     Vec2& pos = player.transform.localPosition;  // reference so changes apply directly
 
-    int left   = (int)(pos.x) / TILE_SIZE;
-    int right  = (int)(pos.x + pSize.x) / TILE_SIZE;
-    int top    = (int)(pos.y) / TILE_SIZE;
-    int bottom = (int)(pos.y + pSize.y) / TILE_SIZE;
+    int left   = (int)std::floor(pos.x / TILE_SIZE);
+    int right  = (int)std::floor((pos.x + pSize.x) / TILE_SIZE);
+    int top    = (int)std::floor(pos.y / TILE_SIZE);
+    int bottom = (int)std::floor((pos.y + pSize.y) / TILE_SIZE);
 
     player.grounded = false;  // reset each frame, let collision set it back
     player.onLeftWall = false;

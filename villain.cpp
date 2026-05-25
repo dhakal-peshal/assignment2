@@ -1,4 +1,5 @@
 #include "villain.h"
+#include "player.h"
 #include "collision.h"
 #include <cmath>
 #include <algorithm>
@@ -61,8 +62,8 @@ void initVillain(Villain &v, Vec2 startPos, Texture spritesheet) {
 
     v.vel        = Vec2(0, 0);
     v.size       = Vec2(VILLAIN_W, VILLAIN_H);
-    v.hp         = 100;
-    v.maxHp      = 100;
+    v.hp         = 4;
+    v.maxHp      = 4;
     v.grounded   = false;
     v.facingRight = true;
 
@@ -146,7 +147,7 @@ void updateVillain(Villain &v, Vec2 playerPos, int &playerHp, float dt, const Le
 
         // Attack player when close enough
         if (distToPlayer <= v.attackRange && v.attackTimer <= 0.f) {
-            playerHp     -= 10;
+            playerHp --;
             v.attackTimer = v.attackCooldown;
         }
     }
@@ -163,11 +164,6 @@ void updateVillain(Villain &v, Vec2 playerPos, int &playerHp, float dt, const Le
 
     // Tile collision
     resolveVillainLevel(v, level);
-
-    //Vec2 villainCenter = v.transform.localPosition + Vec2(VILLAIN_W / 2, VILLAIN_H / 2);
-    //Vec2 dir = playerPos - villainCenter;
-    //v.knifeTransform.localAngle = atan2(toPlayer.y, toPlayer.x);
-
     // animation state
     if(!v.grounded) {
         // airborne - no tick needed, jump is single frame
@@ -214,10 +210,10 @@ void drawVillain(Villain &v) {
 }
 
 
-bool hurtVillain(Villain &v, int damage) {
+bool hurtVillain(Villain &v) {
     if (v.state == VillainState::DEAD) return false;
 
-    v.hp -= damage;
+    v.hp --;
     v.flashTimer = 0.15f;
 
     if (v.hp <= 0) {
@@ -235,7 +231,7 @@ bool hurtVillain(Villain &v, int damage) {
 }
 
 
-void resolveBulletsVillains(std::vector<Bullet> &bullets, std::vector<Villain> &villains, int bulletDamage) {
+void resolveBulletsVillains(std::vector<Bullet> &bullets, std::vector<Villain> &villains) {
     for (Bullet &b : bullets) {
         if (!b.active) continue;
         for (Villain &v : villains) {
@@ -243,7 +239,7 @@ void resolveBulletsVillains(std::vector<Bullet> &bullets, std::vector<Villain> &
             if (collision(b.transform.localPosition, b.size / 2.f,
                           v.transform.localPosition, v.size)) {
                 b.active = false;
-                hurtVillain(v, bulletDamage);
+                hurtVillain(v);
                 break;
             }
         }

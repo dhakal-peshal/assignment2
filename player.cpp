@@ -6,6 +6,7 @@ AudioClip jumpSound;
 void initPlayer(Player &player, Texture spritesheet) {
     player.transform.localPosition = Vec2(100, 550);
     player.vel = Vec2(0, 0);
+    player.hp = 1;
     player.grounded = false;
     player.facingRight = true;
     player.hasShotgun = false;
@@ -19,6 +20,9 @@ void initPlayer(Player &player, Texture spritesheet) {
     player.gunTexture = subTexture(spritesheet, Rect{112.0f, 0, 8, 8});
     player.transform.addChild(&player.gunTransform);
     player.gunTransform.localPosition = Vec2(PLAYER_SIZE_X / 2, PLAYER_SIZE_Y / 2);
+
+    player.fullHeart = subTexture(spritesheet, Rect{112.0f, 8, 8, 8});
+    player.emptyHeart = subTexture(spritesheet, Rect{120.0f, 8, 8, 8});
 
     // idle state
     for(int i = 0; i < 2; i++)
@@ -90,15 +94,15 @@ void updatePlayer(Player &player, float dt){
         player.wallJumpTimer -= dt;
     } else {
         if(x_input != 0) {
-        player.vel.x += x_input * accel * dt;
-        if(player.vel.x >  maxSpeed) player.vel.x =  maxSpeed;
-        else if(player.vel.x < -maxSpeed) player.vel.x = -maxSpeed;
-    } else {
-        // friction when no input
-        float frictionStep = friction * dt;
-        if(std::abs(player.vel.x) <= frictionStep)
-            player.vel.x = 0;
-        else player.vel.x -= std::copysign(frictionStep, player.vel.x);
+            player.vel.x += x_input * accel * dt;
+            if(player.vel.x >  maxSpeed) player.vel.x =  maxSpeed;
+            else if(player.vel.x < -maxSpeed) player.vel.x = -maxSpeed;
+        } else {
+            // friction when no input
+            float frictionStep = friction * dt;
+            if(std::abs(player.vel.x) <= frictionStep)
+                player.vel.x = 0;
+            else player.vel.x -= std::copysign(frictionStep, player.vel.x);
         }
     }
 
@@ -120,6 +124,7 @@ void updatePlayer(Player &player, float dt){
 
     // animation state
     if(!player.grounded) {
+        player.currentAnim = nullptr;
     } else if(std::abs(player.vel.x) > 0.1f) {
         setAnimation(player, player.walk);
         tickAnimation(player, player.walk);
@@ -130,7 +135,6 @@ void updatePlayer(Player &player, float dt){
 }
 
 void drawPlayer(Player &player){
-    //drawRect(player.transform.localPosition, Vec2(PLAYER_SIZE_X, PLAYER_SIZE_Y), Color::red);
     Vec2 drawSize(64, 64);
     if (!player.facingRight) {drawSize.x = -64;}
 
@@ -150,4 +154,13 @@ void drawPlayer(Player &player){
     }
     // draw gun
     drawTexture(player.gunTexture, player.gunTransform.position() - Vec2(32, 32) / 2, Vec2(32, 32), player.gunTransform.angle()*58 - 45);
+
+    // draw heart
+    for (int i = 0; i < 3; i++) {
+        Vec2 heartPos(1080 + i * 64, 8);
+        if(i < player.hp)
+            drawTexture(player.fullHeart,  heartPos, Vec2(64, 64));
+        else
+            drawTexture(player.emptyHeart, heartPos, Vec2(64, 64));
+    }
 }

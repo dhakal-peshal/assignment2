@@ -38,9 +38,11 @@ struct Player{
     Transform transform;
     Rect hitbox;
     Vec2 vel, size;
-    Texture texture;
+    Texture texture, fullHeart, emptyHeart;
     int hp;
-    bool grounded, onLeftWall, onRightWall;
+    bool grounded = false;
+    bool onLeftWall = false;
+    bool onRightWall = false;
     bool hasShotgun, hasBoot;
     int wallJumpDir;
     float wallJumpTimer = 0.0f;

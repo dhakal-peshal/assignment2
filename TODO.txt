@@ -3,13 +3,16 @@ level[x]
 set up textures and animations[x]
 allow multiple textures for tiles[x]
 make gun and bullet[x]
-health [ ]
-menu [ ]
 upgrade pickups [x]
 multiple levels pluss level transitions[x] (read levels from json files)
 meelee enemies[x]
-ranged enemies [ ]
 enemy spawning/despawning [x] (mby using map entries)
+advanced movement (unlocks)[x]
+
+health [ ]
+death [ ]
+menu [ ]
+ranged enemies [ ]
 interactions[ ](damage tiles, destructable walls, targets)
 improve basic player movement[ ] (specifics in updatePlayer)
-advanced movement (unlocks)[x]
+fix enemy jump[ ]

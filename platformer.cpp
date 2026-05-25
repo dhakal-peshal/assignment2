@@ -37,16 +37,14 @@ void init() {
     spritesheet = loadTexture("assets/spritesheet.png");
     shotgun = loadTexture("assets/shotgun.png");
     boot = loadTexture("assets/boot.png");
-    item_sg = subTexture(spritesheet, {8, 16, 8, 8});
-    item_b = subTexture(spritesheet, {16, 16, 8, 8});
 
     SDL_SetTextureScaleMode(playerSprites.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(enemySprites.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(spritesheet.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(shotgun.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(boot.texture, SDL_SCALEMODE_NEAREST);
-    SDL_SetTextureScaleMode(item_sg.texture, SDL_SCALEMODE_NEAREST);
-    SDL_SetTextureScaleMode(item_b.texture, SDL_SCALEMODE_NEAREST);
+    item_sg = subTexture(spritesheet, {8, 16, 8, 8});
+    item_b = subTexture(spritesheet, {16, 16, 8, 8});
 
     initPlayer(player, playerSprites);
     world = loadWorld("assets/levels.json", spritesheet);
@@ -98,8 +96,8 @@ void update(float dt) {
         updateVillain(v, playerCenter, player.hp, dt, currentLevel(world));
     }
 
-    // Bullet <-> villain collision (25 dmg per bullet)
-    resolveBulletsVillains(bullets, villains, 25);
+    // bullet to villain collision
+    resolveBulletsVillains(bullets, villains);
 
     // world transition
     int next = checkLevelTransition(player, currentLevel(world));
@@ -114,7 +112,6 @@ void update(float dt) {
 
 void render(float lag) {
     clear(250,190,150); // background, change to texture in future
-    //drawTexture(bg1, Vec2(0,0), Vec2(320, 180)*4);
     drawLevel(currentLevel(world));
     drawPlayer(player);
 
@@ -139,7 +136,7 @@ void render(float lag) {
     if(showTextBox) {
         if(textBoxPickup == 's')
             drawTexture(shotgun, Vec2(440, 240), Vec2(400, 240));
-        else
+        else // only 2 items exist so no more specific state rquired
             drawTexture(boot, Vec2(440, 240), Vec2(400, 240));
     }
 }
