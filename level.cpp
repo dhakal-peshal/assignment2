@@ -75,17 +75,27 @@ int checkLevelTransition(Player& player, const LevelData& level) {
 }
 // function to handle enemy spawners in place of tiles
 void spawnLevelEntities(LevelData &level, std::vector<Villain> &villains, Texture enemySprites) {
+    level.pickups = level.originalPickups;
     for(int row = 0; row < level.rows; row++) {
         for(int col = 0; col < level.cols; col++) {
             char tile = level.tiles[row][col];
-            if(tile == '8') {
+            if(tile == '8') { // enemy spawning
                 Villain v;
                 Vec2 worldPos(col * TILE_SIZE, row * TILE_SIZE);
                 initVillain(v, worldPos, enemySprites);
                 villains.push_back(v);
+            } else if(tile == 's' || tile == 'b') { // item pickups
+                PickupData pickup;
+                pickup.type = tile;
+                pickup.col = col;
+                pickup.row = row;
+                pickup.active = true;
+                level.pickups.push_back(pickup);
+                level.tiles[row][col] = '0';
             }
         }
     }
+    level.originalPickups = level.pickups;
 }
 
 void wrapPlayerPosition(Player& player, const LevelData& level) {
@@ -175,6 +185,29 @@ void resolveBulletLevel(Bullet& bullet, const LevelData& level) {
                 bullet.active = false;
                 return;  // no need to check further tiles
             }
+        }
+    }
+}
+
+void resolvePickups(LevelData &level, Player &player, bool &showTextBox, char &textBoxPickup, float &textBoxTimer, float textBoxDuration) {
+    Vec2 playerPos  = player.transform.localPosition;
+    Vec2 playerSize = Vec2(PLAYER_SIZE_X, PLAYER_SIZE_Y);
+
+    for(PickupData &pickup : level.pickups) {
+        if(!pickup.active) continue;
+
+        Vec2 pickupPos(pickup.col * TILE_SIZE, pickup.row * TILE_SIZE);
+        Vec2 pickupSize(TILE_SIZE, TILE_SIZE);
+
+        if(collision(playerPos, playerSize, pickupPos, pickupSize)) {
+            pickup.active = false;
+
+            if(pickup.type == 's') player.hasShotgun = true;
+            if(pickup.type == 'b') player.hasBoot = true;
+
+            showTextBox = true;
+            textBoxPickup = pickup.type;
+            textBoxTimer = textBoxDuration;
         }
     }
 }

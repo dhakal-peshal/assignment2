@@ -12,12 +12,21 @@ const int TILE_SIZE = 32;
 
 struct Villain; // forward decloration to avoid circular dependencies
 
+struct PickupData {
+    char type; 
+    int col, row;
+    bool active;
+};
+
 struct LevelData {
     int id, bg;
     std::vector<std::string> tiles;
     int rows, cols;
     int neighbourLeft, neighbourRight, neighbourUp, neighbourDown;
     Texture groundTexture, brickTexture, woodTexture, sheetTexture, background;
+
+    std::vector<PickupData> pickups;
+    std::vector<PickupData> originalPickups;
 };
 
 struct World {
@@ -35,5 +44,6 @@ void wrapPlayerPosition(Player& player, const LevelData& level);
 
 void resolvePlayerLevel(Player& player, const LevelData& level);
 void resolveBulletLevel(Bullet& bullet, const LevelData& level);
+void resolvePickups(LevelData &level, Player &player, bool &showTextBox, char &textBoxPickup, float &textBoxTimer, float textBoxDuration);
 
 #endif

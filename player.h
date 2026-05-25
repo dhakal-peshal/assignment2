@@ -41,6 +41,7 @@ struct Player{
     Texture texture;
     int hp;
     bool grounded, onLeftWall, onRightWall;
+    bool hasShotgun, hasBoot;
     int wallJumpDir;
     float wallJumpTimer = 0.0f;
 

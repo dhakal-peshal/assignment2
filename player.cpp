@@ -8,6 +8,8 @@ void initPlayer(Player &player, Texture spritesheet) {
     player.vel = Vec2(0, 0);
     player.grounded = false;
     player.facingRight = true;
+    player.hasShotgun = false;
+    player.hasBoot = false;
     player.frame = 0;
     player.animStart = getTimeInSeconds();
 
@@ -66,7 +68,7 @@ void updatePlayer(Player &player, float dt){
         playOnce(jumpSound, 1.0f);
         player.grounded = false;
     } 
-    else if (keyPressedThisFrame(KEY_SPACE) && onWall && !player.grounded) {
+    else if (keyPressedThisFrame(KEY_SPACE) && onWall && !player.grounded && player.hasBoot) {
         // kick away from the wall horizontally so player can't jump directly vertically, only allow altered wall jumps
         if(player.onRightWall && player.wallJumpDir != 1) {
             player.vel.y = jump;

@@ -21,6 +21,12 @@ AudioClip pShot, sShot, sReload;
 float sTimer, pTimer = 0.0f;
 bool sReloading = false;
 
+// pickup text variables
+bool showTextBox = false;
+char textBoxPickup = ' ';
+float textBoxTimer = 0.0f;
+const float TEXT_BOX_DURATION = 5.0f;
+
 // Initialise (called once at start)
 void init() {
     setWindowTitle("Platformer");
@@ -46,6 +52,12 @@ void update(float dt) {
     // player movement and collision
     updatePlayer(player, dt);
     resolvePlayerLevel(player, currentLevel(world));
+    resolvePickups(currentLevel(world), player, showTextBox, textBoxPickup, textBoxTimer, TEXT_BOX_DURATION);
+
+    if(showTextBox) {
+        textBoxTimer -= dt;
+        if(textBoxTimer <= 0.0f) showTextBox = false;
+    }
 
     // fire bullet + bullet collision
     sTimer -= dt; pTimer -= dt;
@@ -59,7 +71,7 @@ void update(float dt) {
         sReloading = false;
         playOnce(sReload, 1.0f);
     }
-    if (mouseButtonPressedThisFrame(MOUSE_BUTTON_RIGHT) && sTimer <= 0.0f) {
+    if (mouseButtonPressedThisFrame(MOUSE_BUTTON_RIGHT) && sTimer <= 0.0f && player.hasShotgun) {
         sTimer = 1.5f;
         createBullet(bullets, player.gunTransform, spritesheet, 5, 30.0f);
         recoil(player, 300);
@@ -101,9 +113,29 @@ void render(float lag) {
         drawBullet(bullet);
     }
 
-    // Draw villains
+    // draw villains
     for (Villain &v : villains) {
         drawVillain(v);
+    }
+
+    // draw pickups
+    for(PickupData &pickup : currentLevel(world).pickups) {
+        if(!pickup.active) continue;
+        Vec2 pos(pickup.col * TILE_SIZE, pickup.row * TILE_SIZE);
+        Color c = (pickup.type == 'a') ? Color::yellow : Color::cyan;
+        drawRect(pos, Vec2(TILE_SIZE, TILE_SIZE), c);  // replace with drawTexture once you have sprites
+    }
+
+    // draw text box
+    if(showTextBox) {
+        Vec2 boxPos(50, 500);
+        Vec2 boxSize(620, 80);
+        fillRect(boxPos, boxSize, Color(0, 0, 0));
+        drawRect(boxPos, boxSize, Color::white);
+        //if(textBoxPickup == 'a')
+        //    drawText("You picked up item A!", boxPos + Vec2(20, 30), 24, Color::white);
+        //else
+        //    drawText("You picked up item B!", boxPos + Vec2(20, 30), 24, Color::white);
     }
 }
 
