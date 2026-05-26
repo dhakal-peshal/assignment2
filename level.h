@@ -24,6 +24,8 @@ struct LevelData {
     int rows, cols;
     int neighbourLeft, neighbourRight, neighbourUp, neighbourDown;
     Texture groundTexture, brickTexture, woodTexture, sheetTexture, background;
+    //Texture spikeTexture;
+    //Texture healthTexture;
 
     std::vector<PickupData> pickups;
     std::vector<PickupData> originalPickups;

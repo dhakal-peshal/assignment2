@@ -6,7 +6,7 @@ AudioClip jumpSound;
 void initPlayer(Player &player, Texture spritesheet) {
     player.transform.localPosition = Vec2(100, 550);
     player.vel = Vec2(0, 0);
-    player.hp = 1;
+    player.hp = 3;
     player.grounded = false;
     player.facingRight = true;
     player.hasShotgun = false;

@@ -13,7 +13,7 @@
 
 Player player;
 World world;
-Texture spritesheet, playerSprites, enemySprites, shotgun, boot, item_sg, item_b;
+Texture spritesheet, playerSprites, enemySprites, shotgun, boot, item_sg, item_b, item_h;
 std::vector<Bullet> bullets;
 std::vector<Villain> villains;
 
@@ -43,8 +43,10 @@ void init() {
     SDL_SetTextureScaleMode(spritesheet.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(shotgun.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(boot.texture, SDL_SCALEMODE_NEAREST);
+    // item textures
     item_sg = subTexture(spritesheet, {8, 16, 8, 8});
     item_b = subTexture(spritesheet, {16, 16, 8, 8});
+    item_h = subTexture(spritesheet, {24, 16, 8, 8});
 
     initPlayer(player, playerSprites);
     world = loadWorld("assets/levels.json", spritesheet);
@@ -128,8 +130,9 @@ void render(float lag) {
     for(PickupData &pickup : currentLevel(world).pickups) {
         if(!pickup.active) continue;
         Vec2 pos(pickup.col * TILE_SIZE, pickup.row * TILE_SIZE);
-        Texture t = (pickup.type == 's') ? item_sg : item_b; // check which texture to use for item
-        drawTexture(t, pos, Vec2(TILE_SIZE, TILE_SIZE));
+        if (pickup.type == 's') drawTexture(item_sg, pos, Vec2(TILE_SIZE, TILE_SIZE));
+        else if (pickup.type == 'b') drawTexture(item_b, pos, Vec2(TILE_SIZE, TILE_SIZE));
+        else drawTexture(item_h, pos, Vec2(TILE_SIZE, TILE_SIZE));
     }
 
     // draw text box

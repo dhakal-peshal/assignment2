@@ -21,7 +21,8 @@ World loadWorld(const std::string& path, Texture spritesheet) {
         level.groundTexture = subTexture(spritesheet, Rect{0, 0, 8, 8});
         level.brickTexture = subTexture(spritesheet, Rect{8, 0, 8, 8});
         level.woodTexture = subTexture(spritesheet, Rect{16, 0, 8, 8});
-        level.sheetTexture = subTexture(spritesheet, Rect{24, 0, 8, 8});
+        level.sheetTexture = subTexture(spritesheet, Rect{0, 8, 8, 8});
+        //level.spikeTexture  = subTexture(spritesheet, Rect{0,  8, 8, 8});
         // load level data
         level.id = lvl["id"];
         level.bg = lvl["bg"];
@@ -60,7 +61,7 @@ bool tileSolid(const LevelData& level, int col, int row) {
     if(col < 0 || col >= level.cols) return false;
     // slightly scuffed implementation, 0 for air tiles and other numbers for spawn tiles
     char t = level.tiles[row][col];
-    return t != '0' && t != '8' && t != 's' && t != 'b' && t != 'a';
+    return t != '0' && t != '8' && t != 's' && t != 'b' && t != 'h';
 }
 
 int checkLevelTransition(Player& player, const LevelData& level) {
@@ -85,7 +86,7 @@ void spawnLevelEntities(LevelData &level, std::vector<Villain> &villains, Textur
                 Vec2 worldPos(col * TILE_SIZE, row * TILE_SIZE);
                 initVillain(v, worldPos, enemySprites);
                 villains.push_back(v);
-            } else if(tile == 's' || tile == 'b') { // item pickups
+            } else if(tile == 's' || tile == 'b' || tile == 'h') { // item pickups
                 PickupData pickup;
                 pickup.type = tile;
                 pickup.col = col;
@@ -193,7 +194,24 @@ void resolveBulletLevel(Bullet& bullet, const LevelData& level) {
 void resolvePickups(LevelData &level, Player &player, bool &showTextBox, char &textBoxPickup, float &textBoxTimer, float textBoxDuration) {
     Vec2 playerPos  = player.transform.localPosition;
     Vec2 playerSize = Vec2(PLAYER_SIZE_X, PLAYER_SIZE_Y);
+    // spike damage
+    int left   = (int)std::floor(playerPos.x / TILE_SIZE);
+    int right  = (int)std::floor((playerPos.x + playerSize.x) / TILE_SIZE);
+    int top    = (int)std::floor(playerPos.y / TILE_SIZE);
+    int bottom = (int)std::floor((playerPos.y + playerSize.y) / TILE_SIZE);
 
+    for(int row = top; row <= bottom; row++) {
+        for(int col = left; col <= right; col++) {
+            if(row < 0 || row >= level.rows || col < 0 || col >= level.cols) continue;
+            if(level.tiles[row][col] == 'd') {
+                player.hp--;
+                // push player up out of spikes so damage doesn't repeat every frame
+                player.transform.localPosition.y = (row * TILE_SIZE) - playerSize.y - 1;
+                player.vel.y = -500.0f;  // spike bounce
+            }
+        }
+    }
+    // item pickup
     for(PickupData &pickup : level.pickups) {
         if(!pickup.active) continue;
 
@@ -205,10 +223,13 @@ void resolvePickups(LevelData &level, Player &player, bool &showTextBox, char &t
 
             if(pickup.type == 's') player.hasShotgun = true;
             if(pickup.type == 'b') player.hasBoot = true;
+            if(pickup.type == 'h' && player.hp < 3) player.hp++;
 
-            showTextBox = true;
-            textBoxPickup = pickup.type;
-            textBoxTimer = textBoxDuration;
+            if(pickup.type != 'h') {  // display text box for everything but bandage pickup
+                showTextBox   = true;
+                textBoxPickup = pickup.type;
+                textBoxTimer  = textBoxDuration;
+            }
         }
     }
 }
@@ -225,7 +246,8 @@ void drawLevel(const LevelData& level) {
                     case '1': drawTexture(level.groundTexture, pos, Vec2(32, 32)); break;
                     case '2': drawTexture(level.brickTexture,   pos, Vec2(32, 32)); break;
                     case '3': drawTexture(level.woodTexture,  pos, Vec2(32, 32)); break;
-                    case '4': drawTexture(level.sheetTexture,  pos, Vec2(32, 32)); break;
+                    //case '4': drawTexture(level.sheetTexture,  pos, Vec2(32, 32)); break;
+                    case 'd': drawTexture(level.sheetTexture, pos, Vec2(32, 32)); break;
                     case 'a': break; // air/invisible tile
                     default:  drawTexture(level.groundTexture, pos, Vec2(32, 32)); break;
                 }
