@@ -43,9 +43,10 @@ struct Player{
     bool grounded = false;
     bool onLeftWall = false;
     bool onRightWall = false;
-    bool hasShotgun, hasBoot;
+    bool hasShotgun, hasBoot, dead;
     int wallJumpDir;
     float wallJumpTimer = 0.0f;
+    float respawnTimer;
 
     Animation idle, walk;
     Texture jump;
@@ -58,10 +59,9 @@ struct Player{
 };
 
 void initPlayer(Player &player, Texture spritesheet);
-//void setAnimation(Player &player, Animation &anim);
-//void tickAnimation(Player &player, Animation &anim);
 void recoil(Player &player, int amount);
 void updatePlayer(Player &player, float dt);
+void killPlayer(Player &player);
 void drawPlayer(Player &player);
 
 #endif
