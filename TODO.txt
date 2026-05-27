@@ -8,11 +8,11 @@ multiple levels pluss level transitions[x] (read levels from json files)
 meelee enemies[x]
 enemy spawning/despawning [x] (mby using map entries)
 advanced movement (unlocks)[x]
+health [x]
+damage tiles [x]
 
-health [ ]
 death [ ]
 menu [ ]
 ranged enemies [ ]
-interactions[ ](damage tiles, destructable walls, targets)
 improve basic player movement[ ] (specifics in updatePlayer)
 fix enemy jump[ ]

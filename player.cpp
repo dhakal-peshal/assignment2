@@ -13,6 +13,8 @@ void initPlayer(Player &player, Texture spritesheet) {
     player.hasBoot = false;
     player.frame = 0;
     player.animStart = getTimeInSeconds();
+    player.dead = false;
+    player.respawnTimer = 0.0f;
 
     jumpSound = loadAudioClip("./assets/audio/jump.wav");
 
@@ -55,6 +57,13 @@ void recoil(Player &player, int amount) {
 }
 
 void updatePlayer(Player &player, float dt){
+    if(player.dead) { // skip entire block if player has died
+        player.respawnTimer -= dt;
+        return;
+    }
+
+    if(player.hp <= 0) killPlayer(player); // check for death
+
     float maxSpeed = 200.0f;
     float accel = 1200.0f;
     float friction = 800.0f;
@@ -131,6 +140,14 @@ void updatePlayer(Player &player, float dt){
     } else {
         setAnimation(player, player.idle);
         tickAnimation(player, player.idle);
+    }
+}
+
+void killPlayer(Player &player) {
+    if(!player.dead) {
+        player.dead = true;
+        player.respawnTimer = 3.0f;
+        player.vel = Vec2(0, 0);
     }
 }
 

@@ -13,7 +13,7 @@
 
 Player player;
 World world;
-Texture spritesheet, playerSprites, enemySprites, shotgun, boot, item_sg, item_b, item_h;
+Texture spritesheet, playerSprites, enemySprites, shotgun, boot, item_sg, item_b, item_h, deathScreen;
 std::vector<Bullet> bullets;
 std::vector<Villain> villains;
 
@@ -37,12 +37,14 @@ void init() {
     spritesheet = loadTexture("assets/spritesheet.png");
     shotgun = loadTexture("assets/shotgun.png");
     boot = loadTexture("assets/boot.png");
+    deathScreen = loadTexture("assets/death.png");
 
     SDL_SetTextureScaleMode(playerSprites.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(enemySprites.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(spritesheet.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(shotgun.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(boot.texture, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureScaleMode(deathScreen.texture, SDL_SCALEMODE_NEAREST);
     // item textures
     item_sg = subTexture(spritesheet, {8, 16, 8, 8});
     item_b = subTexture(spritesheet, {16, 16, 8, 8});
@@ -57,7 +59,35 @@ void init() {
     sReload = loadAudioClip("./assets/audio/shotgun_reload.wav");
 }
 
+void respawnPlayer(Player &player, World &world, std::vector<Villain> &villains, std::vector<Bullet> &bullets, Texture enemySprites) {
+    player.dead = false;
+    player.respawnTimer = 0.0f;
+    player.hp = 3;
+
+    // Return to start room and reset position to start coordinates
+    if (!player.hasShotgun && !player.hasBoot) {
+        world.currentLevel = 0;
+    player.transform.localPosition = Vec2(100, 550);
+    } else if (player.hasShotgun && !player.hasBoot) {
+        world.currentLevel = 3;
+        player.transform.localPosition = Vec2(50, 200);
+    } else if (player.hasShotgun && player.hasBoot) {
+        world.currentLevel = 8;
+    player.transform.localPosition = Vec2(50, 50);
+    }
+    
+    spawnLevelEntities(currentLevel(world), villains, enemySprites);
+    bullets.clear();
+    player.vel = Vec2(0, 0);
+}
+
 void update(float dt) {
+    if(player.dead) {
+        updatePlayer(player, dt);  // ticks respawnTimer
+        if(player.respawnTimer <= 0.0f)
+            respawnPlayer(player, world, villains, bullets, enemySprites);
+        return;  // skip rest of update while dead
+    }
     // player movement and collision
     updatePlayer(player, dt);
     resolvePlayerLevel(player, currentLevel(world));
@@ -141,6 +171,10 @@ void render(float lag) {
             drawTexture(shotgun, Vec2(440, 240), Vec2(400, 240));
         else // only 2 items exist so no more specific state rquired
             drawTexture(boot, Vec2(440, 240), Vec2(400, 240));
+    }
+
+    if(player.dead) {
+        drawTexture(deathScreen, Vec2(400, 200), Vec2(480, 320));
     }
 }
 
