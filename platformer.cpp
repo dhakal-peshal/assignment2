@@ -11,6 +11,42 @@
 #include "bullet.h"
 #include "villain.h"
 
+enum GameState {
+    STATE_MAIN_MENU,
+    STATE_PLAYING
+};
+
+GameState gameState = STATE_MAIN_MENU;
+
+Texture menuBackground;
+AudioClip menuClick;
+
+struct Button {
+    float x, y, w, h;
+    const char *label;
+};
+// As for game name we can just make a pnng and stick it in the background, Less code to do XD
+Button btnStart = { 490, 310, 300, 70, "START" };
+Button btnQuit  = { 490, 410, 300, 70, "QUIT"  };
+
+bool isHovered(const Button &b) {
+    Vec2 m = mousePosition();
+    return m.x >= b.x && m.x <= b.x + b.w &&
+           m.y >= b.y && m.y <= b.y + b.h;
+}
+
+void drawButton(const Button &b, bool hovered) {
+    fillRect(b.x + 4, b.y + 4, b.w, b.h, 0, 0, 0, 120);
+    if (hovered)
+        fillRect(b.x, b.y, b.w, b.h, 220, 80,  20, 230);
+    else
+        fillRect(b.x, b.y, b.w, b.h, 30,  10,  10, 200);
+    drawRect(b.x, b.y, b.w, b.h, 255, 160, 60, 255);
+    int labelX = (int)(b.x + b.w / 2 - (strlen(b.label) * 4));
+    int labelY = (int)(b.y + b.h / 2 - 4);
+    drawText((float)labelX, (float)labelY, (char*)b.label, 255, 230, 160, 255);
+}
+
 Player player;
 World world;
 Texture spritesheet, playerSprites, enemySprites, shotgun, boot, item_sg, item_b, item_h, deathScreen;
@@ -28,8 +64,8 @@ float textBoxTimer = 0.0f;
 const float TEXT_BOX_DURATION = 5.0f;
 
 // Initialise (called once at start)
-void init() {
-    setWindowTitle("Platformer");
+void initGame() {
+    
 
     // loading spritesheets and setting scale mode
     playerSprites = loadTexture("assets/player.png");
@@ -80,8 +116,27 @@ void respawnPlayer(Player &player, World &world, std::vector<Villain> &villains,
     bullets.clear();
     player.vel = Vec2(0, 0);
 }
-
+void init() {
+    setWindowTitle ("Platformer");
+    menuBackground = loadTexture("assets/background.png");
+    menuClick = loadAudioClip("./assets/audio/menu_click.wav");
+}
 void update(float dt) {
+    if (gameState == STATE_MAIN_MENU) {
+        if (mouseButtonPressedThisFrame(MOUSE_BUTTON_LEFT)) {
+            if (isHovered(btnStart)) {
+                playOnce(menuClick, 1.0f);
+                initGame();
+                gameState = STATE_PLAYING;
+            } else if (isHovered(btnQuit)) {
+                playOnce(menuClick, 1.0f);
+                SDL_Quit();
+                exit(0);
+            }
+        }
+        return;
+    }
+
     if(player.dead) {
         updatePlayer(player, dt);  // ticks respawnTimer
         if(player.respawnTimer <= 0.0f)
@@ -143,6 +198,13 @@ void update(float dt) {
 }
 
 void render(float lag) {
+    if (gameState == STATE_MAIN_MENU) {
+        drawTexture(menuBackground, 0.0f, 0.0f, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
+        drawButton(btnStart, isHovered(btnStart));
+        drawButton(btnQuit,  isHovered(btnQuit));
+        return;
+    }
+
     clear(250,190,150); // background, change to texture in future
     drawLevel(currentLevel(world));
     drawPlayer(player);
