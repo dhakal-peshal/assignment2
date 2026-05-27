@@ -54,7 +54,7 @@ bool edgeAhead(Villain &v, const LevelData &level) {
 }
 
 
-void initVillain(Villain &v, Vec2 startPos, Texture spritesheet) {
+void initVillain(Villain &v, Vec2 startPos, Texture spritesheet, int weaponType) {
     v.transform.localPosition = startPos;
     v.transform.localAngle    = 0.f;
     v.transform.localScale    = Vec2(1, 1);
@@ -95,10 +95,12 @@ void initVillain(Villain &v, Vec2 startPos, Texture spritesheet) {
     // jump
     v.jump = subTexture(spritesheet, Rect{6 * 16.0f, 0, 16, 16});
 
-    // knife sprite
-    v.knifeTexture = subTexture(spritesheet, Rect{112.0f, 8, 8, 8});
-    v.transform.addChild(&v.knifeTransform);
-    v.knifeTransform.localPosition = Vec2(VILLAIN_W / 2, VILLAIN_H / 2);
+    // weapon sprite
+    v.weaponType = weaponType;
+    if (v.weaponType == 0) v.weaponTexture = subTexture(spritesheet, Rect{112.0f, 0, 8, 8}); // load gun
+    if (v.weaponType == 1) v.weaponTexture = subTexture(spritesheet, Rect{112.0f, 8, 8, 8}); // load knife
+    v.transform.addChild(&v.weaponTransform);
+    v.weaponTransform.localPosition = Vec2(VILLAIN_W / 2, VILLAIN_H / 2);
 
     v.animStart = getTimeInSeconds();
     v.frame = 0;
@@ -175,7 +177,7 @@ void updateVillain(Villain &v, Vec2 playerPos, int &playerHp, float dt, const Le
         tickAnimation(v, v.idle);
     }
 
-    // knife update
+    // weapon update
     Vec2 villainCenter = v.transform.localPosition + Vec2(VILLAIN_W / 2, VILLAIN_H / 2);
     Vec2 dir = playerPos - villainCenter;
     float len = sqrt(dir.x * dir.x + dir.y * dir.y);
@@ -183,8 +185,8 @@ void updateVillain(Villain &v, Vec2 playerPos, int &playerHp, float dt, const Le
         dir.x /= len;
         dir.y /= len;
     }
-    v.knifeTransform.localAngle = atan2(dir.y, dir.x);
-    v.knifeTransform.localPosition = Vec2(VILLAIN_W / 2, VILLAIN_H / 2) + dir * 25.0f;  // fixed offset distance
+    v.weaponTransform.localAngle = atan2(dir.y, dir.x);
+    v.weaponTransform.localPosition = Vec2(VILLAIN_W / 2, VILLAIN_H / 2) + dir * 25.0f;  // fixed offset distance
 }
 
 
@@ -204,9 +206,9 @@ void drawVillain(Villain &v) {
         drawTexture(v.idle.frames[v.frame], v.transform.localPosition - spriteOffset, drawSize);
     }
 
-    // Draw knife
-    drawTexture(v.knifeTexture,
-        v.transform.localPosition + v.knifeTransform.localPosition - Vec2(32, 32) / 2, Vec2(32, 32), v.knifeTransform.localAngle * 58 - 45);
+    // Draw weapon
+    drawTexture(v.weaponTexture,
+        v.transform.localPosition + v.weaponTransform.localPosition - Vec2(32, 32) / 2, Vec2(32, 32), v.weaponTransform.localAngle * 58 - 45);
 }
 
 

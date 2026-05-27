@@ -20,9 +20,9 @@ enum class VillainState {
 };
 
 struct Villain {
-    Transform transform, knifeTransform;
+    Transform transform, weaponTransform;
     Vec2 vel, size;
-    int hp, maxHp;
+    int hp, maxHp, weaponType;
     bool grounded, facingRight;
     Animation* currentAnim = nullptr;
 
@@ -40,13 +40,13 @@ struct Villain {
 
     Animation idle, walk;
     Texture jump;
-    Texture knifeTexture;
+    Texture weaponTexture;
     float animStart;
     int frame;
 };
 
 // Lifecycle
-void initVillain(Villain &v, Vec2 startPos, Texture spritesheet);
+void initVillain(Villain &v, Vec2 startPos, Texture spritesheet, int weaponType);
 void updateVillain(Villain &v, Vec2 playerPos, int &playerHp, float dt, const LevelData &level);
 void drawVillain(Villain &v);
 

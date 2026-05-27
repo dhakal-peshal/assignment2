@@ -76,6 +76,7 @@ void respawnPlayer(Player &player, World &world, std::vector<Villain> &villains,
     player.transform.localPosition = Vec2(50, 50);
     }
     
+    villains.clear();
     spawnLevelEntities(currentLevel(world), villains, enemySprites);
     bullets.clear();
     player.vel = Vec2(0, 0);

@@ -10,8 +10,8 @@ enemy spawning/despawning [x] (mby using map entries)
 advanced movement (unlocks)[x]
 health [x]
 damage tiles [x]
+death [x]
 
-death [ ]
 menu [ ]
 ranged enemies [ ]
 improve basic player movement[ ] (specifics in updatePlayer)

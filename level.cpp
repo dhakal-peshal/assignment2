@@ -61,7 +61,7 @@ bool tileSolid(const LevelData& level, int col, int row) {
     if(col < 0 || col >= level.cols) return false;
     // slightly scuffed implementation, 0 for air tiles and other numbers for spawn tiles
     char t = level.tiles[row][col];
-    return t != '0' && t != '8' && t != 's' && t != 'b' && t != 'h';
+    return t != '0' && t != '8' && t != '9' && t != 's' && t != 'b' && t != 'h';
 }
 
 int checkLevelTransition(Player& player, const LevelData& level) {
@@ -81,10 +81,15 @@ void spawnLevelEntities(LevelData &level, std::vector<Villain> &villains, Textur
     for(int row = 0; row < level.rows; row++) {
         for(int col = 0; col < level.cols; col++) {
             char tile = level.tiles[row][col];
-            if(tile == '8') { // enemy spawning
+            if(tile == '8') { // knife enemy spawning
                 Villain v;
                 Vec2 worldPos(col * TILE_SIZE, row * TILE_SIZE);
-                initVillain(v, worldPos, enemySprites);
+                initVillain(v, worldPos, enemySprites, 1);
+                villains.push_back(v);
+            } else if(tile == '9') { // gun senemy spawning
+                Villain v;
+                Vec2 worldPos(col * TILE_SIZE, row * TILE_SIZE);
+                initVillain(v, worldPos, enemySprites, 0);
                 villains.push_back(v);
             } else if(tile == 's' || tile == 'b' || tile == 'h') { // item pickups
                 PickupData pickup;
