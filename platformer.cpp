@@ -69,7 +69,7 @@ bool tutorialClosing = false;
 
 Player player;
 World world;
-Texture spritesheet, playerSprites, enemySprites, shotgun, boot, item_sg, item_b, item_h, deathScreen;
+Texture spritesheet, playerSprites, enemySprites, shotgun, boot, item_sg, item_b, item_h, deathScreen3, deathScreen2, deathScreen1;
 std::vector<Bullet> bullets;
 std::vector<Villain> villains;
 
@@ -93,14 +93,18 @@ void initGame() {
     spritesheet = loadTexture("assets/spritesheet.png");
     shotgun = loadTexture("assets/shotgun.png");
     boot = loadTexture("assets/boot.png");
-    deathScreen = loadTexture("assets/death.png");
+    deathScreen3 = loadTexture("assets/death.png");
+    deathScreen2 = loadTexture("assets/death 2.png");
+    deathScreen1 = loadTexture("assets/death 1.png");
 
     SDL_SetTextureScaleMode(playerSprites.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(enemySprites.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(spritesheet.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(shotgun.texture, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureScaleMode(boot.texture, SDL_SCALEMODE_NEAREST);
-    SDL_SetTextureScaleMode(deathScreen.texture, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureScaleMode(deathScreen3.texture, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureScaleMode(deathScreen2.texture, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureScaleMode(deathScreen1.texture, SDL_SCALEMODE_NEAREST);
     // item textures
     item_sg = subTexture(spritesheet, {8, 16, 8, 8});
     item_b = subTexture(spritesheet, {16, 16, 8, 8});
@@ -344,7 +348,7 @@ void render(float lag) {
     }
 
     if(player.dead) {
-        drawTexture(deathScreen, Vec2(400, 200), Vec2(480, 320));
+         { Texture &ds = (player.respawnTimer > 2.0f) ? deathScreen3 : (player.respawnTimer > 1.0f) ? deathScreen2 : deathScreen1; drawTexture(ds, Vec2(400, 200), Vec2(480, 320)); }
     }
     if (tutorialActive)
         drawTutorial(tutorialSlide);
