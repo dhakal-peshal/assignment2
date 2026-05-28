@@ -7,6 +7,7 @@
 using json = nlohmann::json;
 
 Texture bg;
+AudioClip itemSound, hurtSound;
 
 World loadWorld(const std::string& path, Texture spritesheet) {
     std::ifstream file(path);
@@ -17,6 +18,9 @@ World loadWorld(const std::string& path, Texture spritesheet) {
 
     for(auto& lvl : data["levels"]) {
         LevelData level;
+        itemSound = loadAudioClip("./assets/audio/pickup.wav");
+        hurtSound = loadAudioClip("./assets/audio/damage.wav");
+
         // load level textures
         level.groundTexture = subTexture(spritesheet, Rect{0, 0, 8, 8});
         level.brickTexture = subTexture(spritesheet, Rect{8, 0, 8, 8});
@@ -214,6 +218,7 @@ void resolvePickups(LevelData &level, Player &player, bool &showTextBox, char &t
                 // push player up out of spikes so damage doesn't repeat every frame
                 player.transform.localPosition.y = (row * TILE_SIZE) - playerSize.y - 1;
                 player.vel.y = -500.0f;  // spike bounce
+                playOnce(hurtSound, 1.0f);
             }
         }
     }
@@ -229,13 +234,14 @@ void resolvePickups(LevelData &level, Player &player, bool &showTextBox, char &t
 
             if(pickup.type == 's') player.hasShotgun = true;
             if(pickup.type == 'b') player.hasBoot = true;
-            if(pickup.type == 'h' && player.hp < 3) player.hp++;
+            if(pickup.type == 'h' && player.hp < 5) player.hp++;
 
             if(pickup.type != 'h') {  // display text box for everything but bandage pickup
                 showTextBox   = true;
                 textBoxPickup = pickup.type;
                 textBoxTimer  = textBoxDuration;
             }
+            playOnce(itemSound, 1.0f);
         }
     }
 }

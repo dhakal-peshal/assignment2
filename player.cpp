@@ -6,7 +6,7 @@ AudioClip jumpSound;
 void initPlayer(Player &player, Texture spritesheet) {
     player.transform.localPosition = Vec2(100, 550);
     player.vel = Vec2(0, 0);
-    player.hp = 3;
+    player.hp = 5;
     player.grounded = false;
     player.facingRight = true;
     player.hasShotgun = false;
@@ -173,8 +173,8 @@ void drawPlayer(Player &player){
     drawTexture(player.gunTexture, player.gunTransform.position() - Vec2(32, 32) / 2, Vec2(32, 32), player.gunTransform.angle()*58 - 45);
 
     // draw heart
-    for (int i = 0; i < 3; i++) {
-        Vec2 heartPos(1080 + i * 64, 8);
+    for (int i = 0; i < 5; i++) {
+        Vec2 heartPos(960 + i * 64, 8);
         if(i < player.hp)
             drawTexture(player.fullHeart,  heartPos, Vec2(64, 64));
         else

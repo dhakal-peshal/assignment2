@@ -4,7 +4,7 @@
 #include <cmath>
 #include <algorithm>
 
-
+AudioClip hit_sound, hurt_sound;
 
 float sign(float v) { return (v > 0.f) ? 1.f : (v < 0.f) ? -1.f : 0.f; }
 
@@ -55,6 +55,8 @@ bool edgeAhead(Villain &v, const LevelData &level) {
 
 
 void initVillain(Villain &v, Vec2 startPos, Texture spritesheet, int weaponType) {
+    hit_sound   = loadAudioClip("./assets/audio/damage.wav");
+    hurt_sound = loadAudioClip("./assets/audio/hitenemy.wav");
     v.transform.localPosition = startPos;
     v.transform.localAngle    = 0.f;
     v.transform.localScale    = Vec2(1, 1);
@@ -151,6 +153,7 @@ void updateVillain(Villain &v, Vec2 playerPos, int &playerHp, float dt, const Le
         if (distToPlayer <= v.attackRange && v.attackTimer <= 0.f) {
             playerHp --;
             v.attackTimer = v.attackCooldown;
+             playOnce(hit_sound, 1.0f);
         }
     }
 
@@ -226,6 +229,7 @@ bool hurtVillain(Villain &v) {
 
     v.hurtTimer = 0.3f;
     v.state     = VillainState::HURT;
+     playOnce(hurt_sound, 1.0f);
     // Knock back slightly
     v.vel.x = v.facingRight ? -120.f : 120.f;
     v.vel.y = -150.f;

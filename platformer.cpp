@@ -90,15 +90,15 @@ void initGame() {
     world = loadWorld("assets/levels.json", spritesheet);
     spawnLevelEntities(currentLevel(world), villains, enemySprites);
 
-    pShot   = loadAudioClip("./assets/audio/pistolshot.wav");
-    sShot   = loadAudioClip("./assets/audio/shotgunshot.wav");
+    pShot = loadAudioClip("./assets/audio/pistolshot.wav");
+    sShot = loadAudioClip("./assets/audio/shotgunshot.wav");
     sReload = loadAudioClip("./assets/audio/shotgun_reload.wav");
 }
 
 void respawnPlayer(Player &player, World &world, std::vector<Villain> &villains, std::vector<Bullet> &bullets, Texture enemySprites) {
     player.dead = false;
     player.respawnTimer = 0.0f;
-    player.hp = 3;
+    player.hp = 5;
 
     // Return to start room and reset position to start coordinates
     if (!player.hasShotgun && !player.hasBoot) {
