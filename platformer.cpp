@@ -19,6 +19,8 @@ enum GameState {
 GameState gameState = STATE_MAIN_MENU;
 
 Texture menuBackground;
+Texture sheriffTexture;
+Texture dialogueBoxTexture;
 AudioClip menuClick;
 
 struct Button {
@@ -46,6 +48,24 @@ void drawButton(const Button &b, bool hovered) {
     int labelY = (int)(b.y + b.h / 2 - 4);
     drawText((float)labelX, (float)labelY, (char*)b.label, 255, 230, 160, 255);
 }
+struct TutorialLine {
+    const char *text;
+};
+
+const TutorialLine TUTORIAL_STEPS[] = {
+    { "Howdy partner! Welcome to the Ranch!" },
+    { "Use A amd D to move left & right, and Space to jump!" },
+    { "Left-click your mouse to fire your trusty pistol." },
+    { "Also find the Wall walking boots!" },
+    { "Pro tip: shoot while jumping for an inertia boost!" },
+    { "Now get out there, cowboy. Good luck!" },
+};
+const int TUTORIAL_STEP_COUNT = 6;
+
+int  tutorialStep    = 0;      
+bool tutorialActive  = true;   
+float tutorialSlide  = 0.0f;   
+bool tutorialClosing = false;  
 
 Player player;
 World world;
@@ -93,6 +113,11 @@ void initGame() {
     pShot = loadAudioClip("./assets/audio/pistolshot.wav");
     sShot = loadAudioClip("./assets/audio/shotgunshot.wav");
     sReload = loadAudioClip("./assets/audio/shotgun_reload.wav");
+
+    tutorialStep    = 0;
+    tutorialActive  = true;
+    tutorialSlide   = 0.0f;
+    tutorialClosing = false;
 }
 
 void respawnPlayer(Player &player, World &world, std::vector<Villain> &villains, std::vector<Bullet> &bullets, Texture enemySprites) {
@@ -117,9 +142,66 @@ void respawnPlayer(Player &player, World &world, std::vector<Villain> &villains,
     bullets.clear();
     player.vel = Vec2(0, 0);
 }
+void drawTutorial(float slide) {
+    if (slide <= 0.0f) return;
+
+    const float panelW   = 560.0f;
+    const float panelH   = 160.0f;
+    const float sheriffW = 110.0f;
+    const float sheriffH = 150.0f;   
+    const float margin   = 18.0f;
+
+    
+    float panelX = margin;
+    float panelY = (float)WINDOW_HEIGHT - margin - panelH;
+    float offsetY = (1.0f - slide) * (panelH + margin);
+    panelY += offsetY;
+
+    
+    fillRect(panelX + 5, panelY + 5, panelW, panelH, 0, 0, 0, 100);
+
+    
+    drawTexture(dialogueBoxTexture, Vec2(panelX, panelY), Vec2(panelW, panelH));
+
+    
+    float sx = panelX + 8.0f;
+    float sy = panelY + (panelH - sheriffH) / 2.0f;
+    drawTexture(sheriffTexture, Vec2(sx, sy), Vec2(sheriffW, sheriffH));
+
+    
+    float textX    = panelX + sheriffW + 18.0f;
+    float textAreaW = panelW - sheriffW - 30.0f;
+
+    
+    drawText(textX, panelY + 12.0f, (char*)"Sheriff Sam", 0, 0, 0, 255);
+
+    
+    fillRect(textX, panelY + 28.0f, textAreaW, 1.5f, 0, 0, 0, 255);
+
+    
+    const char *line = TUTORIAL_STEPS[tutorialStep].text;
+    drawText(textX, panelY + 38.0f, (char*)line, 0, 0, 0, 255);
+
+    
+    char stepBuf[16];
+    snprintf(stepBuf, sizeof(stepBuf), "%d / %d", tutorialStep + 1, TUTORIAL_STEP_COUNT);
+    drawText(panelX + panelW - 48.0f, panelY + panelH - 30.0f, stepBuf, 0, 0, 0, 255);
+
+    
+    const char *prompt = (tutorialStep < TUTORIAL_STEP_COUNT - 1)
+                         ? "[ Click to continue ]"
+                         : "[ Click to close ]";
+    drawText(textX, panelY + panelH - 32.0f, (char*)prompt, 0, 0, 0, 255);
+}
+
 void init() {
     setWindowTitle ("Platformer");
     menuBackground = loadTexture("assets/background.png");
+    sheriffTexture     = loadTexture("assets/sheriff.png");
+    dialogueBoxTexture = loadTexture("assets/dialougebox.png");
+    SDL_SetTextureScaleMode(sheriffTexture.texture,     SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureBlendMode(sheriffTexture.texture,     SDL_BLENDMODE_BLEND);
+    SDL_SetTextureScaleMode(dialogueBoxTexture.texture, SDL_SCALEMODE_NEAREST);
     menuClick = loadAudioClip("./assets/audio/menu_click.wav");
 }
 void update(float dt) {
@@ -136,6 +218,31 @@ void update(float dt) {
             }
         }
         return;
+    }
+//for sliding effect
+    if (tutorialActive) {
+        if (!tutorialClosing)
+            tutorialSlide = tutorialSlide + dt * 4.0f;   // slide in
+        else
+            tutorialSlide = tutorialSlide - dt * 4.0f;   // slide out
+
+        if (tutorialSlide > 1.0f) tutorialSlide = 1.0f;
+
+        if (tutorialClosing && tutorialSlide <= 0.0f) {
+            tutorialActive  = false;
+            tutorialClosing = false;
+            tutorialSlide   = 0.0f;
+        }
+
+        //  left-click close
+        if (mouseButtonPressedThisFrame(MOUSE_BUTTON_LEFT) && !tutorialClosing) {
+            playOnce(menuClick, 0.6f);
+            tutorialStep++;
+            if (tutorialStep >= TUTORIAL_STEP_COUNT) {
+                tutorialStep    = TUTORIAL_STEP_COUNT - 1;
+                tutorialClosing = true;
+            }
+        }
     }
 
     if(player.dead) {
@@ -239,6 +346,8 @@ void render(float lag) {
     if(player.dead) {
         drawTexture(deathScreen, Vec2(400, 200), Vec2(480, 320));
     }
+    if (tutorialActive)
+        drawTutorial(tutorialSlide);
 }
 
 void close() {}
