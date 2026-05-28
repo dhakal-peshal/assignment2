@@ -41,6 +41,7 @@ World loadWorld(const std::string& path, Texture spritesheet) {
         else if (level.bg == 4) level.background = loadTexture("assets/bg_out_up.png");
         else if (level.bg == 5) level.background = loadTexture("assets/bg_out_top.png");
         else if (level.bg == 6) level.background = loadTexture("assets/bg_out_r.png");
+        else if (level.bg == 7) level.background = loadTexture("assets/bg_wood2.png");
 
         // level tile allocation
         for(auto& row : lvl["tiles"])
